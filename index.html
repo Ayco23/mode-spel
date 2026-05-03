@@ -493,7 +493,11 @@
         ['Zomerdagen, eindeloos blauw', 'Niemand anders dan ik en jou'],
         ['IJsjes smelten in de hete wind', 'Vakantie waar het feest begint'],
         ['Blote voeten in het warme zand', 'De zomer zingt door heel het land'],
-        ['Pakken pijp aan stille zee', 'Ik neem deze zomer met me mee'],
+        ['Een koud drankje in mijn hand', 'Tenen diep in het gouden zand'],
+        ['Op het strand met een glas in de hand', 'Goede tijden samen aan deze rand'],
+        ['De zon staat hoog, de hemel blauw', 'Niets dan plezier en jij dichtbij trouw'],
+        ['Cocktails klinken bij de zee', 'Ik neem deze zomer met me mee'],
+        ['Zonnebrillen op, muziek staat aan', 'Niets dat ons vandaag kan verslaan'],
       ],
       verdriet: [
         ['Tranen vallen in de regen', 'Zonder jou ben ik bezweken'],
@@ -537,7 +541,12 @@
         ['Summer days, an endless blue', 'No one else but me and you'],
         ['Ice cream melts in the burning heat', 'This summer love is bittersweet'],
         ['Bare feet on the warm shoreline', 'Every moment feels like wine'],
-        ['Salty waves and golden hair', 'Summer love, beyond compare'],
+        ['Cold drink resting in my hand', 'Toes are buried in the sand'],
+        ['Sitting on the beach so fine', 'Sipping on this sweet sunshine'],
+        ['Good times rolling all day long', 'Beach and drinks and a summer song'],
+        ['Sun is high and the sky is gold', 'Nothing better could be told'],
+        ['Cocktails clinking by the sea', 'This is where I want to be'],
+        ['Shades on, the music plays', 'Living for these summer days'],
       ],
       verdriet: [
         ['Tears are falling in the rain', 'Without you all I feel is pain'],
@@ -570,26 +579,29 @@
     },
   };
 
-  function detectTheme(prompt) {
+  function detectThemes(prompt) {
     const p = prompt.toLowerCase();
     const map = [
       ['liefde', /liefde|hart|kus|romant|verliefd|samen|love|heart|kiss|romant/],
-      ['zomer',  /zomer|zon|strand|vakantie|warm|summer|sun|beach|holiday/],
+      ['zomer',  /zomer|zon|strand|vakantie|warm|drink|drankje|cocktail|summer|sun|beach|holiday|drinks|sipping|shore/],
       ['verdriet', /verdriet|traan|tranen|verloren|gemist|alleen|sad|cry|tears|miss|lonely|broken/],
-      ['feest',  /feest|dans|party|club|nacht uit|dance|celebrate/],
+      ['feest',  /feest|dans|party|club|nacht uit|good time|goede tijd|fun|plezier|dance|celebrate/],
       ['vrijheid', /vrij|reis|weg|free|road|adventure|escape/],
       ['nacht',  /nacht|maan|donker|sterren|night|moon|dark|stars/],
     ];
+    const found = [];
     for (const [theme, re] of map) {
-      if (re.test(p)) return theme;
+      if (re.test(p)) found.push(theme);
     }
-    return null;
+    return found;
   }
 
   function generateLyrics(prompt, lang) {
-    const themes = Object.keys(verses[lang]);
-    const theme = detectTheme(prompt) || themes[Math.floor(Math.random() * themes.length)];
-    const pool = verses[lang][theme];
+    const allThemes = Object.keys(verses[lang]);
+    const detected = detectThemes(prompt);
+    const themes = detected.length ? detected : [allThemes[Math.floor(Math.random() * allThemes.length)]];
+    // Combine the verse pools of every detected theme so multi-topic prompts mix nicely.
+    const pool = themes.flatMap(t => verses[lang][t]);
     const a = pool[Math.floor(Math.random() * pool.length)];
     let b;
     do { b = pool[Math.floor(Math.random() * pool.length)]; } while (b === a && pool.length > 1);
