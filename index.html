@@ -371,6 +371,31 @@
   }
   #fashion-app .fg-screen { flex: 1; display: none; flex-direction: column; min-height: 0; }
   #fashion-app .fg-screen.active { display: flex; }
+  #fashion-app .dress-code {
+    margin: 4px 12px 6px;
+    padding: 8px 12px;
+    background: linear-gradient(90deg, rgba(255,79,139,0.15), rgba(138,79,255,0.15));
+    border: 1px solid rgba(138, 79, 255, 0.3);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(138,79,255,0.1);
+  }
+  #fashion-app .dress-code .dc-label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #8a4fff;
+    margin-bottom: 1px;
+  }
+  #fashion-app .dress-code .dc-emoji { font-size: 28px; flex-shrink: 0; }
+  #fashion-app .dress-code .dc-name { font-size: 15px; font-weight: 800; line-height: 1.1; }
+  #fashion-app .dress-code .dc-hint { font-size: 11px; opacity: 0.75; margin-top: 1px; }
+  #fashion-app .dress-code .dc-tags { font-size: 10px; opacity: 0.65; margin-top: 2px; font-weight: 600; }
+
   #fashion-app .fg-header { text-align: center; padding: 6px 12px 2px; flex-shrink: 0; }
   #fashion-app .fg-header h1 {
     font-size: 20px; font-weight: 800; letter-spacing: 0.5px;
@@ -438,9 +463,8 @@
   }
   #fashion-app .body-zone {
     width: 96px;
-    flex: 1 1 auto;
-    max-height: calc(100% - 50px);
-    aspect-ratio: 1 / 2;
+    height: 200px;
+    flex: 0 0 auto;
     position: relative;
     background: rgba(255,255,255,0.4); border-radius: 16px;
     backdrop-filter: blur(6px); box-shadow: 0 6px 18px rgba(0,0,0,0.08);
@@ -470,15 +494,20 @@
   #fashion-app .slot-top    { top: 4%;  height: 36%; width: 78%; }
   #fashion-app .slot-bottom { top: 44%; height: 36%; width: 74%; }
   #fashion-app .slot-shoes  { top: 82%; height: 16%; width: 58%; font-size: 22px; }
-  #fashion-app .slot-acc    {
+  #fashion-app .slot-acc {
     top: 6px; right: 6px; left: auto; transform: none;
-    height: 30px; width: 30px; font-size: 20px;
-    background: rgba(255,255,255,0.6); border-radius: 50%;
+    height: 32px; width: 32px; font-size: 22px;
+    background: rgba(255,255,255,0.7); border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   }
   #fashion-app .slot-acc.empty {
-    font-size: 14px; color: rgba(42,26,58,0.5);
+    width: 32px !important; height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    color: rgba(42,26,58,0.5);
     border: 2px dashed rgba(42,26,58,0.3);
     background: transparent;
+    box-shadow: none;
   }
   #fashion-app .score-pill {
     position: absolute; top: 8px; left: 8px;
@@ -665,12 +694,21 @@
     <div class="home-inner">
       <div class="logo">👗</div>
       <h2>Word jij<br/>de stijlkoning(in)?</h2>
-      <p>Mix tops, broeken, schoenen en accessoires. De beste look wint van de stylist!</p>
+      <p>Krijg een dress code en stel een outfit samen die past. Hoe beter je matcht, hoe hoger je score!</p>
       <button class="fg-btn" id="fg-startBtn">Start spel ✨</button>
     </div>
   </section>
 
   <section class="fg-screen" id="fg-game">
+    <div class="dress-code" id="fg-dressCode">
+      <div class="dc-emoji" id="fg-dcEmoji">🌅</div>
+      <div>
+        <div class="dc-label">Dress code</div>
+        <div class="dc-name" id="fg-dcName">Beach Casual</div>
+        <div class="dc-hint" id="fg-dcHint">Zomer-relaxed</div>
+        <div class="dc-tags" id="fg-dcTags"></div>
+      </div>
+    </div>
     <div class="mannequin-wrap">
       <div class="score-pill" id="fg-livePill">Score: 0</div>
       <div class="mannequin">
@@ -1426,8 +1464,35 @@
     { key: 'acc',    label: '👜 Accessoire' },
   ];
 
+  // Each dress code defines a target style + color family. The score rewards
+  // matching items; the AI stylist picks items that fit the same code.
+  const dressCodes = [
+    { emoji: '🌅', name: 'Beach Casual',  style: 'casual', family: 'warm',    hint: 'Zomer-relaxed, warme tinten' },
+    { emoji: '🎩', name: 'Black Tie',     style: 'chique', family: 'neutral', hint: 'Klassiek formeel, ingetogen' },
+    { emoji: '🏃', name: 'Sportief',      style: 'sport',  family: 'bright',  hint: 'Actief & energiek' },
+    { emoji: '🧢', name: 'Streetwear',    style: 'street', family: 'neutral', hint: 'Urban edge, zwart-wit basis' },
+    { emoji: '💖', name: 'Romantisch',    style: 'chique', family: 'warm',    hint: 'Zacht, lieflijk, roze tinten' },
+    { emoji: '❄️', name: 'Winter Chic',   style: 'chique', family: 'cool',    hint: 'Koel & elegant blauw' },
+    { emoji: '☀️', name: 'Summer Vibes',  style: 'casual', family: 'bright',  hint: 'Vrolijk & zonnig fel' },
+    { emoji: '🤘', name: 'Rock Edgy',     style: 'street', family: 'bright',  hint: 'Stoer & opvallend' },
+    { emoji: '💼', name: 'Business',      style: 'chique', family: 'cool',    hint: 'Professioneel en strak' },
+    { emoji: '🎨', name: 'Casual Cool',   style: 'casual', family: 'neutral', hint: 'Tijdloos clean' },
+  ];
+  const familyLabels = { warm: 'warm', cool: 'koel', neutral: 'neutraal', bright: 'fel' };
+  const styleLabels  = { casual: 'casual', chique: 'chique', sport: 'sportief', street: 'street' };
+
   let activeTab = 'top';
+  let currentDressCode = dressCodes[0];
   const outfit = { top: null, bottom: null, shoes: null, acc: null };
+
+  function pickDressCode() {
+    const choice = dressCodes[Math.floor(Math.random() * dressCodes.length)];
+    currentDressCode = choice;
+    $('#fg-dcEmoji').textContent = choice.emoji;
+    $('#fg-dcName').textContent = choice.name;
+    $('#fg-dcHint').textContent = choice.hint;
+    $('#fg-dcTags').textContent = `Stijl: ${styleLabels[choice.style]} • Kleur: ${familyLabels[choice.family]}`;
+  }
 
   const tabsEl = $('#fg-tabs');
   const itemsEl = $('#fg-items');
@@ -1497,53 +1562,49 @@
     updateLiveScore();
   }
 
-  function score(o) {
+  // Score against the active dress code. Style match and color match each cap at 30,
+  // trend at 15, completeness at 25 — total 100.
+  function score(o, dc = currentDressCode) {
     const parts = [o.top, o.bottom, o.shoes, o.acc].filter(Boolean);
-    if (parts.length === 0) return { total: 0, harmony: 0, style: 0, trend: 0, complete: 0 };
+    if (parts.length === 0) return { total: 0, style: 0, color: 0, trend: 0, complete: 0 };
 
-    const families = parts.map(p => p.family);
-    const uniqueNonNeutral = new Set(families.filter(f => f !== 'neutral'));
-    let harmony;
-    if (uniqueNonNeutral.size <= 1) harmony = 25;
-    else if (uniqueNonNeutral.size === 2) harmony = 18;
-    else harmony = 8;
+    const styleMatches = parts.filter(p => p.style === dc.style).length;
+    const styleScore = Math.round((styleMatches / parts.length) * 30);
 
-    const styles = parts.map(p => p.style);
-    const uniqueStyles = new Set(styles);
-    let styleScore;
-    if (uniqueStyles.size === 1) styleScore = 25;
-    else if (uniqueStyles.size === 2) styleScore = 16;
-    else styleScore = 6;
+    // Neutrals partially blend with any family.
+    const colorMatches = parts.reduce((sum, p) => {
+      if (p.family === dc.family) return sum + 1;
+      if (p.family === 'neutral' || dc.family === 'neutral') return sum + 0.5;
+      return sum;
+    }, 0);
+    const colorScore = Math.round((colorMatches / parts.length) * 30);
 
     const trendAvg = parts.reduce((s, p) => s + p.trend, 0) / parts.length;
-    const trendScore = Math.round(trendAvg * 2.5);
-    const complete = parts.length === 4 ? 25 : parts.length * 4;
-    const total = harmony + styleScore + trendScore + complete;
-    return { total, harmony, style: styleScore, trend: trendScore, complete };
+    const trendScore = Math.round(trendAvg * 1.5);
+    const complete = parts.length === 4 ? 25 : parts.length * 5;
+
+    const total = styleScore + colorScore + trendScore + complete;
+    return { total, style: styleScore, color: colorScore, trend: trendScore, complete };
   }
 
   function updateLiveScore() {
     livePill.textContent = `Score: ${score(outfit).total}`;
   }
 
-  function generateAiOutfit() {
-    const families = ['warm', 'cool', 'neutral', 'bright'];
-    const styles = ['casual', 'chique', 'sport', 'street'];
-    const tFam = families[Math.floor(Math.random() * families.length)];
-    const tSty = styles[Math.floor(Math.random() * styles.length)];
-
+  function generateAiOutfit(dc = currentDressCode) {
     function pickFor(slot) {
       const pool = wardrobe[slot];
       const ranked = pool.map((it, idx) => {
         let s = it.trend;
-        if (it.family === tFam || it.family === 'neutral') s += 5;
-        if (it.style === tSty) s += 4;
+        if (it.style === dc.style) s += 6;
+        if (it.family === dc.family) s += 5;
+        else if (it.family === 'neutral') s += 2;
         return { it, idx, s };
       }).sort((a, b) => b.s - a.s);
+      // Top 2 to add a little variety, but the AI mostly nails the code.
       const choice = ranked[Math.floor(Math.random() * Math.min(2, ranked.length))];
       return { ...choice.it, idx: choice.idx };
     }
-
     return {
       top: pickFor('top'),
       bottom: pickFor('bottom'),
@@ -1576,10 +1637,10 @@
     $('#fg-verdictText').textContent = text;
 
     $('#fg-breakdown').innerHTML = `
-      <h3>Jouw beoordeling</h3>
-      <div class="br-row"><span>🎨 Kleurharmonie</span><span>${you.harmony}/25</span></div>
-      <div class="br-row"><span>✨ Stijlcoherentie</span><span>${you.style}/25</span></div>
-      <div class="br-row"><span>🔥 Trendscore</span><span>${you.trend}/25</span></div>
+      <h3>${currentDressCode.emoji} Dress code: ${currentDressCode.name}</h3>
+      <div class="br-row"><span>✨ Stijlmatch (${styleLabels[currentDressCode.style]})</span><span>${you.style}/30</span></div>
+      <div class="br-row"><span>🎨 Kleurmatch (${familyLabels[currentDressCode.family]})</span><span>${you.color}/30</span></div>
+      <div class="br-row"><span>🔥 Trendscore</span><span>${you.trend}/15</span></div>
       <div class="br-row"><span>👗 Compleetheid</span><span>${you.complete}/25</span></div>
       <div class="br-row" style="border-top:1px solid rgba(0,0,0,0.1); margin-top:6px; padding-top:8px;">
         <span><b>Totaal</b></span><span><b>${you.total}/100</b></span>
@@ -1588,10 +1649,16 @@
     showScreen('result');
   }
 
-  $('#fg-startBtn').onclick = () => showScreen('game');
+  function startNewGame() {
+    pickDressCode();
+    resetOutfit();
+    showScreen('game');
+  }
+
+  $('#fg-startBtn').onclick = startNewGame;
   $('#fg-resetBtn').onclick = resetOutfit;
   $('#fg-judgeBtn').onclick = judge;
-  $('#fg-playAgainBtn').onclick = () => { resetOutfit(); showScreen('game'); };
+  $('#fg-playAgainBtn').onclick = startNewGame;
 
   renderTabs();
   renderItems();
