@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#8a4fff" />
+<title>Zing-o-Matic</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0d0820;
+    color: #f0e9ff;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: hidden;
+  }
+  body {
+    background: #0d0820;
+  }
+  #root {
+    height: 100dvh;
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
+  #topTabs {
+    display: flex;
+    gap: 6px;
+    padding: calc(env(safe-area-inset-top) + 6px) 10px 6px;
+    background: #0d0820;
+    flex-shrink: 0;
+    z-index: 5;
+  }
+  #topTabs button {
+    flex: 1;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #f0e9ff;
+    padding: 9px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  #topTabs button.active {
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(138, 79, 255, 0.4);
+  }
+  .app { display: none; flex: 1; min-height: 0; flex-direction: column; }
+  .app.active { display: flex; }
+  #sing-app {
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,79,139,0.35), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(79,195,255,0.30), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(138,79,255,0.25), transparent 60%),
+      #0d0820;
+    padding: 0 12px env(safe-area-inset-bottom);
+    color: #f0e9ff;
+  }
+  header {
+    text-align: center;
+    padding: 12px 0 6px;
+    position: relative;
+  }
+  header h1 {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #ff4f8b, #ffd84a, #4fc3ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header p { font-size: 11px; opacity: 0.6; margin-top: 2px; }
+
+  main {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 4px 2px 90px;
+  }
+  main::-webkit-scrollbar { display: none; }
+
+  section.card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 10px 12px;
+    backdrop-filter: blur(10px);
+  }
+  .row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    opacity: 0.6;
+    text-transform: uppercase;
+  }
+  .lang-toggle {
+    display: flex;
+    gap: 4px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 999px;
+    padding: 3px;
+  }
+  .lang-toggle button {
+    background: transparent;
+    border: none;
+    color: #f0e9ff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .lang-toggle button.active {
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    box-shadow: 0 2px 8px rgba(138, 79, 255, 0.4);
+  }
+
+  .h-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    margin: 0 -4px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  .h-scroll::-webkit-scrollbar { display: none; }
+
+  .chip {
+    flex: 0 0 auto;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid transparent;
+    color: #f0e9ff;
+    border-radius: 12px;
+    padding: 9px 11px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 110px;
+    transition: all 0.15s ease;
+  }
+  .chip:active { transform: scale(0.95); }
+  .chip.active {
+    background: linear-gradient(135deg, #ff4f8b, #8a4fff);
+    border-color: rgba(255,255,255,0.4);
+    box-shadow: 0 6px 18px rgba(138,79,255,0.45);
+  }
+  .chip .emoji { font-size: 20px; }
+  .chip .meta { font-size: 10px; opacity: 0.75; font-weight: 500; }
+
+  .mode-tabs {
+    display: flex;
+    gap: 4px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    padding: 3px;
+    margin-bottom: 10px;
+  }
+  .mode-tabs button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #f0e9ff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .mode-tabs button.active {
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    box-shadow: 0 2px 8px rgba(138, 79, 255, 0.4);
+  }
+
+  textarea, input[type="text"] {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: #f0e9ff;
+    padding: 11px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: none;
+    line-height: 1.4;
+  }
+  textarea { min-height: 90px; }
+  textarea:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: #ff4f8b;
+    box-shadow: 0 0 0 2px rgba(255,79,139,0.2);
+  }
+
+  .row {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .preset {
+    flex: 1 1 auto;
+    background: rgba(255,255,255,0.08);
+    border: none;
+    color: #f0e9ff;
+    padding: 7px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .preset:active { transform: scale(0.95); }
+
+  .gen-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #4fc3ff, #8a4fff);
+    color: white;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(79, 195, 255, 0.35);
+  }
+  .gen-btn:active { transform: scale(0.97); }
+
+  .stage {
+    background: linear-gradient(180deg, rgba(255,79,139,0.12), rgba(79,195,255,0.12));
+    border-radius: 16px;
+    padding: 16px 12px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.08);
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stage .who {
+    font-size: 13px;
+    font-weight: 700;
+    opacity: 0.85;
+  }
+  .stage .who .small { font-size: 10px; opacity: 0.7; font-weight: 500; }
+  .lyric {
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.35;
+    min-height: 22px;
+    max-height: 80px;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .lyric::-webkit-scrollbar { display: none; }
+  .lyric .syl {
+    display: inline-block;
+    transition: transform 0.15s ease, color 0.15s ease;
+    margin: 0 1px;
+  }
+  .lyric .syl.on {
+    color: #ffd84a;
+    transform: translateY(-5px) scale(1.15);
+    text-shadow: 0 4px 14px rgba(255,216,74,0.6);
+  }
+
+  .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 26px;
+  }
+  .bar {
+    width: 4px;
+    background: linear-gradient(180deg, #ff4f8b, #4fc3ff);
+    border-radius: 2px;
+    height: 4px;
+    transition: height 0.1s ease;
+  }
+  .bars.on .bar { animation: dance 0.6s infinite alternate; }
+  .bars.on .bar:nth-child(2) { animation-delay: 0.1s; }
+  .bars.on .bar:nth-child(3) { animation-delay: 0.2s; }
+  .bars.on .bar:nth-child(4) { animation-delay: 0.05s; }
+  .bars.on .bar:nth-child(5) { animation-delay: 0.15s; }
+  @keyframes dance { to { height: 24px; } }
+
+  footer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, transparent, #0d0820 40%);
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+  footer > * { pointer-events: auto; }
+  footer .inner {
+    width: 100%;
+    max-width: 456px;
+    display: flex;
+    gap: 8px;
+  }
+  .btn {
+    border: none;
+    color: white;
+    padding: 13px 18px;
+    font-size: 15px;
+    font-weight: 800;
+    border-radius: 999px;
+    cursor: pointer;
+    flex: 1;
+    box-shadow: 0 8px 22px rgba(138, 79, 255, 0.45);
+    transition: transform 0.12s ease;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn.sing { background: linear-gradient(90deg, #ff4f8b, #8a4fff); }
+  .btn.stop {
+    background: rgba(255,255,255,0.1);
+    color: #f0e9ff;
+    box-shadow: none;
+    flex: 0 0 70px;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .toast {
+    position: fixed;
+    bottom: 84px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.95);
+    color: #0d0820;
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; }
+
+  .hidden { display: none !important; }
+
+  /* ====== FASHION GAME (scoped) ====== */
+  #fashion-app {
+    background: linear-gradient(160deg, #ffd1e1 0%, #c8b6ff 50%, #b8e1ff 100%);
+    color: #2a1a3a;
+  }
+  #fashion-app .fg-screen { flex: 1; display: none; flex-direction: column; min-height: 0; }
+  #fashion-app .fg-screen.active { display: flex; }
+  #fashion-app .dress-code {
+    margin: 4px 12px 6px;
+    padding: 8px 12px;
+    background: linear-gradient(90deg, rgba(255,79,139,0.15), rgba(138,79,255,0.15));
+    border: 1px solid rgba(138, 79, 255, 0.3);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(138,79,255,0.1);
+  }
+  #fashion-app .dress-code .dc-label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #8a4fff;
+    margin-bottom: 1px;
+  }
+  #fashion-app .dress-code .dc-emoji { font-size: 28px; flex-shrink: 0; }
+  #fashion-app .dress-code .dc-name { font-size: 15px; font-weight: 800; line-height: 1.1; }
+  #fashion-app .dress-code .dc-hint { font-size: 11px; opacity: 0.75; margin-top: 1px; }
+  #fashion-app .dress-code .dc-tags { font-size: 10px; opacity: 0.65; margin-top: 2px; font-weight: 600; }
+
+  #fashion-app .fg-header { text-align: center; padding: 6px 12px 2px; flex-shrink: 0; }
+  #fashion-app .fg-header h1 {
+    font-size: 20px; font-weight: 800; letter-spacing: 0.5px;
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  #fashion-app .fg-header p { font-size: 11px; opacity: 0.7; margin-top: 1px; }
+
+  #fashion-app .home-inner {
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    padding: 24px; gap: 18px;
+  }
+  #fashion-app .logo {
+    font-size: 72px;
+    filter: drop-shadow(0 8px 14px rgba(255, 79, 139, 0.4));
+    animation: fg-float 3s ease-in-out infinite;
+  }
+  @keyframes fg-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  #fashion-app .home-inner h2 { font-size: 26px; font-weight: 900; line-height: 1.1; }
+  #fashion-app .home-inner p { font-size: 14px; opacity: 0.75; max-width: 300px; line-height: 1.5; }
+
+  #fashion-app .fg-btn {
+    border: none;
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    color: white; padding: 14px 28px;
+    font-size: 16px; font-weight: 700; border-radius: 999px;
+    box-shadow: 0 8px 22px rgba(138, 79, 255, 0.4);
+    cursor: pointer; transition: transform 0.15s ease;
+  }
+  #fashion-app .fg-btn:active { transform: scale(0.96); }
+  #fashion-app .fg-btn.secondary {
+    background: rgba(255,255,255,0.7); color: #2a1a3a;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  }
+
+  #fashion-app .mannequin-wrap {
+    position: relative; flex: 0 0 auto; height: 38vh; max-height: 320px; min-height: 220px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 4px 12px 0;
+    overflow: hidden;
+  }
+  #fashion-app .mannequin {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center;
+    height: 100%;
+  }
+  #fashion-app .head {
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(160deg, #ffd6b8, #f5b890);
+    box-shadow: inset -5px -5px 10px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: -6px; position: relative; z-index: 1;
+    flex-shrink: 0;
+  }
+  #fashion-app .head::before, #fashion-app .head::after {
+    content: ''; position: absolute; top: 19px;
+    width: 4px; height: 4px; background: #2a1a3a; border-radius: 50%;
+  }
+  #fashion-app .head::before { left: 14px; }
+  #fashion-app .head::after { right: 14px; }
+  #fashion-app .smile {
+    position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+    width: 14px; height: 7px; border-bottom: 2px solid #2a1a3a;
+    border-radius: 0 0 7px 7px;
+  }
+  #fashion-app .body-zone {
+    width: 96px;
+    height: 200px;
+    flex: 0 0 auto;
+    position: relative;
+    background: rgba(255,255,255,0.4); border-radius: 16px;
+    backdrop-filter: blur(6px); box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  }
+  #fashion-app .slot {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; transition: transform 0.25s ease;
+  }
+  #fashion-app .slot.empty {
+    font-size: 10px; color: rgba(42,26,58,0.4);
+    border: 2px dashed rgba(42,26,58,0.25);
+    border-radius: 10px; width: 72%; text-align: center;
+  }
+  #fashion-app .slot.filled { animation: fg-pop 0.35s ease; }
+  #fashion-app .slot-acc.filled { animation: fg-pop-acc 0.35s ease; }
+  @keyframes fg-pop {
+    0% { transform: translateX(-50%) scale(0.4); }
+    60% { transform: translateX(-50%) scale(1.15); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+  @keyframes fg-pop-acc {
+    0% { transform: scale(0.4); }
+    60% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  #fashion-app .slot-top    { top: 4%;  height: 36%; width: 78%; }
+  #fashion-app .slot-bottom { top: 44%; height: 36%; width: 74%; }
+  #fashion-app .slot-shoes  { top: 82%; height: 16%; width: 58%; font-size: 22px; }
+  #fashion-app .slot-acc {
+    top: 6px; right: 6px; left: auto; transform: none;
+    height: 32px; width: 32px; font-size: 22px;
+    background: rgba(255,255,255,0.7); border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  #fashion-app .slot-acc.empty {
+    width: 32px !important; height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    color: rgba(42,26,58,0.5);
+    border: 2px dashed rgba(42,26,58,0.3);
+    background: transparent;
+    box-shadow: none;
+  }
+  #fashion-app .score-pill {
+    position: absolute; top: 8px; left: 8px;
+    background: rgba(255,255,255,0.85);
+    padding: 6px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; color: #8a4fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  #fashion-app .picker {
+    flex: 1 1 auto;
+    background: rgba(255,255,255,0.6); backdrop-filter: blur(10px);
+    border-radius: 24px 24px 0 0; padding: 10px 12px env(safe-area-inset-bottom);
+    display: flex; flex-direction: column; min-height: 0;
+    box-shadow: 0 -6px 22px rgba(0,0,0,0.08);
+  }
+  #fashion-app .fg-tabs {
+    display: flex; gap: 6px; margin-bottom: 8px;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  #fashion-app .fg-tabs::-webkit-scrollbar { display: none; }
+  #fashion-app .fg-tab {
+    flex: 1 0 auto; padding: 7px 12px; border-radius: 999px;
+    background: rgba(255,255,255,0.7); font-size: 12px;
+    font-weight: 600; border: none; cursor: pointer;
+    color: #2a1a3a; white-space: nowrap; transition: all 0.15s ease;
+  }
+  #fashion-app .fg-tab.active {
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    color: white; box-shadow: 0 4px 10px rgba(138, 79, 255, 0.35);
+  }
+  #fashion-app .items {
+    flex: 1; display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; overflow-y: auto; padding: 4px 2px 8px; align-content: start;
+  }
+  #fashion-app .item {
+    aspect-ratio: 1; background: white; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; cursor: pointer; border: 2px solid transparent;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06); position: relative;
+    transition: transform 0.12s ease, border-color 0.12s ease;
+  }
+  #fashion-app .item:active { transform: scale(0.92); }
+  #fashion-app .item.selected {
+    border-color: #ff4f8b;
+    box-shadow: 0 0 0 3px rgba(255,79,139,0.2), 0 4px 10px rgba(255,79,139,0.25);
+  }
+  #fashion-app .item .swatch {
+    position: absolute; bottom: 4px; right: 4px;
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 1.5px solid white; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  #fashion-app .actions { display: flex; gap: 8px; margin-top: 6px; }
+  #fashion-app .actions .fg-btn { flex: 1; padding: 11px; font-size: 14px; }
+
+  #fashion-app .result-inner {
+    flex: 1; overflow-y: auto; padding: 14px;
+    display: flex; flex-direction: column; gap: 12px; align-items: center;
+  }
+  #fashion-app .verdict { font-size: 44px; text-align: center; animation: fg-pop 0.5s ease; }
+  #fashion-app .verdict-text {
+    font-size: 24px; font-weight: 900; text-align: center;
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  #fashion-app .vs-row { display: flex; gap: 10px; width: 100%; align-items: stretch; }
+  #fashion-app .outfit-card {
+    flex: 1; background: rgba(255,255,255,0.75);
+    border-radius: 18px; padding: 12px 8px; text-align: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+  }
+  #fashion-app .outfit-card.winner {
+    background: linear-gradient(160deg, #fff4cf, #ffd6e0);
+    box-shadow: 0 6px 20px rgba(255,179,71,0.4);
+    transform: scale(1.03);
+  }
+  #fashion-app .outfit-card .label { font-size: 12px; opacity: 0.7; font-weight: 600; }
+  #fashion-app .outfit-card .stack { font-size: 26px; line-height: 1.05; margin: 6px 0; }
+  #fashion-app .outfit-card .pts { font-size: 22px; font-weight: 900; color: #8a4fff; }
+  #fashion-app .breakdown {
+    width: 100%; background: rgba(255,255,255,0.65);
+    border-radius: 16px; padding: 12px 14px; font-size: 13px;
+  }
+  #fashion-app .breakdown h3 { font-size: 14px; margin-bottom: 8px; }
+  #fashion-app .br-row { display: flex; justify-content: space-between; padding: 4px 0; }
+  #fashion-app .br-row span:last-child { font-weight: 700; color: #8a4fff; }
+  #fashion-app .vs-badge {
+    align-self: center; font-weight: 900; font-size: 14px;
+    color: #ff4f8b; padding: 4px 10px; background: white;
+    border-radius: 999px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+  #fashion-app .fg-toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: rgba(42,26,58,0.92); color: white;
+    padding: 10px 18px; border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 100;
+  }
+  #fashion-app .fg-toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
+</style>
+</head>
+<body>
+<div id="root">
+  <nav id="topTabs">
+    <button class="active" data-app="sing">🎤 Zingen</button>
+    <button data-app="fashion">👗 Mode Spel</button>
+  </nav>
+
+<div id="sing-app" class="app active">
+  <header>
+    <h1>🎤 ZING-O-MATIC</h1>
+    <p>Kies artiest, taal, genre & tekst</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="row-head">
+        <span class="label">Taal</span>
+        <div class="lang-toggle" id="langToggle">
+          <button data-lang="nl" class="active">🇳🇱 Nederlands</button>
+          <button data-lang="en">🇬🇧 English</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="label">1. Artiest</div>
+      <div class="h-scroll" id="artists"></div>
+    </section>
+
+    <section class="card">
+      <div class="label">2. Genre</div>
+      <div class="h-scroll" id="genres"></div>
+    </section>
+
+    <section class="card">
+      <div class="label">3. Tekst</div>
+      <div class="mode-tabs" id="modeTabs">
+        <button data-mode="exact" class="active">📝 Exacte tekst</button>
+        <button data-mode="prompt">✨ Genereer uit prompt</button>
+      </div>
+
+      <div id="exactPanel">
+        <textarea id="lyrics" placeholder="Schrijf hier de exacte songtekst..." maxlength="500">De zon schijnt door het raam, ik zing een lied voor jou</textarea>
+        <div class="row" id="presetRow"></div>
+      </div>
+
+      <div id="promptPanel" class="hidden">
+        <input type="text" id="prompt" placeholder="bijv. een liefdesliedje over de zomer" maxlength="120" />
+        <button class="gen-btn" id="genBtn">✨ Genereer lyrics</button>
+        <textarea id="generatedLyrics" placeholder="Gegenereerde tekst verschijnt hier — je mag aanpassen" maxlength="500"></textarea>
+      </div>
+    </section>
+
+    <section class="stage">
+      <div class="who" id="who">Selecteer een artiest & genre</div>
+      <div class="lyric" id="lyric">🎶 ... 🎶</div>
+      <div class="bars" id="bars">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <div class="bar"></div><div class="bar"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="inner">
+      <button class="btn sing" id="singBtn">🎤 Laat zingen</button>
+      <button class="btn stop" id="stopBtn">⏹</button>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<div id="fashion-app" class="app">
+  <header class="fg-header">
+    <h1>Mode Spel</h1>
+    <p>Stel jouw perfecte outfit samen</p>
+  </header>
+
+  <section class="fg-screen active" id="fg-home">
+    <div class="home-inner">
+      <div class="logo">👗</div>
+      <h2>Word jij<br/>de stijlkoning(in)?</h2>
+      <p>Krijg een dress code en stel een outfit samen die past. Hoe beter je matcht, hoe hoger je score!</p>
+      <button class="fg-btn" id="fg-startBtn">Start spel ✨</button>
+    </div>
+  </section>
+
+  <section class="fg-screen" id="fg-game">
+    <div class="dress-code" id="fg-dressCode">
+      <div class="dc-emoji" id="fg-dcEmoji">🌅</div>
+      <div>
+        <div class="dc-label">Dress code</div>
+        <div class="dc-name" id="fg-dcName">Beach Casual</div>
+        <div class="dc-hint" id="fg-dcHint">Zomer-relaxed</div>
+        <div class="dc-tags" id="fg-dcTags"></div>
+      </div>
+    </div>
+    <div class="mannequin-wrap">
+      <div class="score-pill" id="fg-livePill">Score: 0</div>
+      <div class="mannequin">
+        <div class="head"><div class="smile"></div></div>
+        <div class="body-zone">
+          <div class="slot slot-top empty" data-slot="top">Top</div>
+          <div class="slot slot-bottom empty" data-slot="bottom">Broek</div>
+          <div class="slot slot-shoes empty" data-slot="shoes">Schoenen</div>
+          <div class="slot slot-acc empty" data-slot="acc">+</div>
+        </div>
+      </div>
+    </div>
+    <div class="picker">
+      <div class="fg-tabs" id="fg-tabs"></div>
+      <div class="items" id="fg-items"></div>
+      <div class="actions">
+        <button class="fg-btn secondary" id="fg-resetBtn">Wis</button>
+        <button class="fg-btn" id="fg-judgeBtn">Beoordeel 🏆</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="fg-screen" id="fg-result">
+    <div class="result-inner">
+      <div class="verdict" id="fg-verdictEmoji">🎉</div>
+      <div class="verdict-text" id="fg-verdictText">Geweldig!</div>
+      <div class="vs-row">
+        <div class="outfit-card" id="fg-cardYou">
+          <div class="label">JIJ</div>
+          <div class="stack" id="fg-stackYou"></div>
+          <div class="pts" id="fg-ptsYou">0</div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="outfit-card" id="fg-cardAi">
+          <div class="label">STYLIST</div>
+          <div class="stack" id="fg-stackAi"></div>
+          <div class="pts" id="fg-ptsAi">0</div>
+        </div>
+      </div>
+      <div class="breakdown" id="fg-breakdown"></div>
+      <button class="fg-btn" id="fg-playAgainBtn">Opnieuw spelen 🔁</button>
+    </div>
+  </section>
+
+  <div class="fg-toast" id="fg-toast"></div>
+</div>
+
+</div><!-- /#root -->
+
+<script>
+  // Top-level tab switcher: shows the active app, hides the other.
+  document.querySelectorAll('#topTabs button').forEach(b => {
+    b.onclick = () => {
+      const app = b.dataset.app;
+      document.querySelectorAll('#topTabs button').forEach(x => x.classList.toggle('active', x === b));
+      document.querySelectorAll('.app').forEach(a => a.classList.toggle('active', a.id === app + '-app'));
+      // Stop singing if user navigates away from the singing app.
+      if (app !== 'sing' && window.__zingStop) window.__zingStop();
+    };
+  });
+</script>
+
+<script>
+(function() {
+  // ---------- ARTISTS ----------
+  // Voice hints are ranked by preference. They're matched against the available voice
+  // names on the device, restricted to the currently selected language.
+  // pitch: base pitch multiplier (the artist's voice character).
+  // rate:  base speech rate (slower = soulful, faster = rap).
+  const artists = [
+    { id: 'springsteen', name: 'Bruce Springsteen', emoji: '🎸', gender: 'male',
+      pitch: 0.65, rate: 0.88, defaultLang: 'en-US',
+      hints: ['aaron', 'arthur', 'fred', 'rocko', 'reed', 'ralph', 'eddy'],
+      meta: 'The Boss' },
+    { id: 'cash',     name: 'Johnny Cash',   emoji: '🤠', gender: 'male',
+      pitch: 0.5, rate: 0.78, defaultLang: 'en-US',
+      hints: ['fred', 'aaron', 'arthur', 'ralph', 'rocko'],
+      meta: 'Diepe stem' },
+    { id: 'drake',    name: 'Drake',         emoji: '🦉', gender: 'male',
+      pitch: 0.78, rate: 0.95, defaultLang: 'en-US',
+      hints: ['alex', 'aaron', 'tom', 'evan'],
+      meta: 'Smooth flow' },
+    { id: 'sheeran',  name: 'Ed Sheeran',    emoji: '🎸', gender: 'male',
+      pitch: 1.05, rate: 1.0, defaultLang: 'en-GB',
+      hints: ['daniel', 'oliver', 'arthur', 'martin'],
+      meta: 'Akoestisch' },
+    { id: 'eminem',   name: 'Eminem',        emoji: '🔥', gender: 'male',
+      pitch: 0.95, rate: 1.45, defaultLang: 'en-US',
+      hints: ['alex', 'aaron', 'evan', 'tom'],
+      meta: 'Snel & scherp' },
+    { id: 'adele',    name: 'Adele',         emoji: '🎙️', gender: 'female',
+      pitch: 0.9, rate: 0.82, defaultLang: 'en-GB',
+      hints: ['kate', 'serena', 'fiona', 'moira', 'tessa', 'martha'],
+      meta: 'Soulful UK' },
+    { id: 'beyonce',  name: 'Beyoncé',       emoji: '👑', gender: 'female',
+      pitch: 1.2, rate: 1.0, defaultLang: 'en-US',
+      hints: ['samantha', 'ava', 'allison', 'susan', 'nicky'],
+      meta: 'Diva power' },
+    { id: 'taylor',   name: 'Taylor Swift',  emoji: '✨', gender: 'female',
+      pitch: 1.1, rate: 1.05, defaultLang: 'en-US',
+      hints: ['ava', 'samantha', 'allison', 'susan', 'karen'],
+      meta: 'Pop sweet' },
+    { id: 'aguilera', name: 'Christina A.',  emoji: '💖', gender: 'female',
+      pitch: 1.4, rate: 0.95, defaultLang: 'en-US',
+      hints: ['samantha', 'ava', 'susan', 'allison'],
+      meta: 'Hoge noten' },
+    { id: 'etta',     name: 'Etta James',    emoji: '🎺', gender: 'female',
+      pitch: 0.82, rate: 0.78, defaultLang: 'en-US',
+      hints: ['serena', 'kate', 'victoria', 'susan', 'allison', 'martha', 'fiona'],
+      meta: 'Blues lady' },
+    { id: 'nina',     name: 'Nina Simone',   emoji: '🎹', gender: 'female',
+      pitch: 0.72, rate: 0.8, defaultLang: 'en-US',
+      hints: ['serena', 'kate', 'victoria', 'martha', 'fiona', 'moira'],
+      meta: 'Soul & blues' },
+    { id: 'hazes',    name: 'André Hazes',   emoji: '🍻', gender: 'male',
+      pitch: 0.62, rate: 0.85, defaultLang: 'nl-NL',
+      hints: ['xander', 'nederlands', 'dutch'],
+      meta: 'Levenslied' },
+    { id: 'borsato',  name: 'Marco Borsato', emoji: '❤️', gender: 'male',
+      pitch: 0.85, rate: 0.92, defaultLang: 'nl-NL',
+      hints: ['xander', 'nederlands', 'dutch'],
+      meta: 'Smartlap' },
+  ];
+
+  // ---------- GENRES ----------
+  const genres = [
+    { id: 'pop',     name: 'Pop',     emoji: '🎵', melody: [1.0, 1.1, 1.05, 1.15, 1.0, 0.95], rateMul: 1.0,  pause: 90,  meta: 'Vrolijk' },
+    { id: 'rock',    name: 'Rock',    emoji: '🎸', melody: [0.9, 1.0, 0.85, 0.95, 1.1, 0.9],  rateMul: 1.05, pause: 70,  meta: 'Stevig' },
+    { id: 'opera',   name: 'Opera',   emoji: '🎭', melody: [1.2, 1.4, 1.3, 1.5, 1.25, 1.1],   rateMul: 0.6,  pause: 220, meta: 'Dramatisch' },
+    { id: 'rap',     name: 'Rap',     emoji: '🎤', melody: [0.95, 0.9, 1.0, 0.95],            rateMul: 1.6,  pause: 30,  meta: 'Spitting' },
+    { id: 'ballad',  name: 'Ballad',  emoji: '🕯️', melody: [0.95, 1.05, 1.0, 1.1, 0.9, 0.85], rateMul: 0.7,  pause: 180, meta: 'Emotioneel' },
+    { id: 'techno',  name: 'Techno',  emoji: '🤖', melody: [1.0, 1.0, 1.05, 1.0, 0.95, 1.0],  rateMul: 1.3,  pause: 50,  meta: 'Hypnotisch' },
+    { id: 'reggae',  name: 'Reggae',  emoji: '🌴', melody: [1.0, 0.95, 1.05, 0.9, 1.0, 0.95], rateMul: 0.85, pause: 140, meta: 'Chillax' },
+    { id: 'country', name: 'Country', emoji: '🤠', melody: [0.95, 1.05, 1.1, 0.95, 1.0, 0.9], rateMul: 0.9,  pause: 120, meta: 'Twangy' },
+    { id: 'jazz',    name: 'Jazz',    emoji: '🎷', melody: [1.0, 1.1, 0.85, 1.05, 0.9, 1.15], rateMul: 0.95, pause: 130, meta: 'Smooth' },
+    { id: 'blues',   name: 'Blues',   emoji: '🎺', melody: [0.95, 0.85, 1.0, 0.88, 1.05, 0.9, 0.82], rateMul: 0.72, pause: 220, meta: 'Soulful slow' },
+    { id: 'kinder',  name: 'Kinder',  emoji: '🧸', melody: [1.2, 1.3, 1.4, 1.3, 1.2, 1.35],   rateMul: 1.1,  pause: 100, meta: 'Vrolijk hoog' },
+  ];
+
+  // ---------- LYRICS GENERATOR ----------
+  // Curated rhyming verses per theme/language. Two random verses are joined into 4 lines.
+  const verses = {
+    nl: {
+      liefde: [
+        ['Jij bent mijn zon op een grijze dag', 'Voor jou doe ik alles wat ik mag'],
+        ['Onze harten kloppen samen in tijd', 'Ik weet dat dit voor altijd blijft'],
+        ['In jouw ogen vind ik mijn thuis', 'Met jou voelt elke storm als bries'],
+        ['Een kus van jou en de wereld staat stil', 'Ik volg jou waar je ook gaan wil'],
+        ['Door dik en dun, jij bent van mij', 'Geen één is zo bijzonder als jij'],
+      ],
+      zomer: [
+        ['De zon schijnt fel op het strand', 'Ik dans met jou hand in hand'],
+        ['Zomerdagen, eindeloos blauw', 'Niemand anders dan ik en jou'],
+        ['IJsjes smelten in de hete wind', 'Vakantie waar het feest begint'],
+        ['Blote voeten in het warme zand', 'De zomer zingt door heel het land'],
+        ['Een koud drankje in mijn hand', 'Tenen diep in het gouden zand'],
+        ['Op het strand met een glas in de hand', 'Goede tijden samen aan deze rand'],
+        ['De zon staat hoog, de hemel blauw', 'Niets dan plezier en jij dichtbij trouw'],
+        ['Cocktails klinken bij de zee', 'Ik neem deze zomer met me mee'],
+        ['Zonnebrillen op, muziek staat aan', 'Niets dat ons vandaag kan verslaan'],
+      ],
+      verdriet: [
+        ['Tranen vallen in de regen', 'Zonder jou ben ik bezweken'],
+        ['Lege kamers, koude muren', 'Ik tel de minuten en de uren'],
+        ['Mijn hart ligt in duizend stukken', 'Niets dat dit nog kan ontrukken'],
+        ['De stilte schreeuwt jouw naam terug', 'Kom alsjeblieft toch nog terug'],
+        ['Donkere nachten zonder licht', 'Ik mis jouw stem, jouw lach, jouw gezicht'],
+      ],
+      feest: [
+        ['Dansen tot de zon opkomt', 'Vannacht voelt zo verdomd goed'],
+        ['Beats die door mijn aderen gaan', 'Niemand kan ons hier nog verslaan'],
+        ['Hef je glas, de nacht is jong', 'Zing mee met dit gezang'],
+        ['Lichten flitsen op de vloer', 'Wij dansen tot de morgen door'],
+        ['Iedereen staat op zijn kop', 'Dit feest stopt hier echt nog niet op'],
+      ],
+      vrijheid: [
+        ['De weg ligt open, lang en breed', 'Ik laat alles wat zwaar is gereed'],
+        ['Wind in mijn haren, vrij en wild', 'Geen muren die mij nog stilt'],
+        ['Vleugels uitslaan naar de lucht', 'Niemand die mijn vlam nog blust'],
+        ['Achterom kijken doe ik niet meer', 'Voorwaarts, telkens telkens weer'],
+        ['Ik loop mijn eigen pad alleen', 'Vrijheid stroomt door elk been'],
+      ],
+      nacht: [
+        ['Sterren fluisteren een lied', 'Iemand die me vannacht ziet'],
+        ['De maan kleurt zilver op de straat', 'Het uur waarop niemand bestaat'],
+        ['Donkere uren, stille tijd', 'Mijn gedachten zijn wijd en breed'],
+        ['Lantarens dansen op het plein', 'In de nacht voel ik mij vrij'],
+        ['Onder een hemel vol met licht', 'Sluit ik langzaam mijn gezicht'],
+      ],
+    },
+    en: {
+      liefde: [
+        ['You are my sunshine on a cloudy day', 'For you I would do anything you say'],
+        ['Our hearts beat as one through the night', 'With you everything just feels right'],
+        ['In your eyes I find my home', 'With you I never feel alone'],
+        ['One kiss from you and time stands still', 'I follow you wherever you will'],
+        ['Through thick and thin you are mine', 'No one else makes my soul shine'],
+      ],
+      zomer: [
+        ['Sun is shining on the sand', 'Dancing with you, hand in hand'],
+        ['Summer days, an endless blue', 'No one else but me and you'],
+        ['Ice cream melts in the burning heat', 'This summer love is bittersweet'],
+        ['Bare feet on the warm shoreline', 'Every moment feels like wine'],
+        ['Cold drink resting in my hand', 'Toes are buried in the sand'],
+        ['Sitting on the beach so fine', 'Sipping on this sweet sunshine'],
+        ['Good times rolling all day long', 'Beach and drinks and a summer song'],
+        ['Sun is high and the sky is gold', 'Nothing better could be told'],
+        ['Cocktails clinking by the sea', 'This is where I want to be'],
+        ['Shades on, the music plays', 'Living for these summer days'],
+      ],
+      verdriet: [
+        ['Tears are falling in the rain', 'Without you all I feel is pain'],
+        ['Empty rooms and silent walls', 'I count the minutes as time crawls'],
+        ['My heart lies in a thousand parts', 'Broken open, missing arts'],
+        ['The silence screams your name out loud', 'Come back to me, break through the cloud'],
+        ['Dark nights without a light', 'I miss your voice, your touch, your sight'],
+      ],
+      feest: [
+        ['Dancing till the sun comes up', 'Tonight we fill the highest cup'],
+        ['Beats are running through my veins', 'No one breaks these golden chains'],
+        ['Raise your glass the night is young', 'Sing along this party song'],
+        ['Lights are flashing on the floor', 'We will dance forevermore'],
+        ['Everybody loses control', 'This party feeds my hungry soul'],
+      ],
+      vrijheid: [
+        ['The road stretches wide and free', 'I leave behind what used to be'],
+        ['Wind is rushing through my hair', 'No more walls, no more despair'],
+        ['Spreading wings into the sky', 'Nothing left to wonder why'],
+        ['I will never look behind', 'Forward, leaving chains behind'],
+        ['Walking my own path alone', 'Freedom calls me to the unknown'],
+      ],
+      nacht: [
+        ['Stars are whispering a song', 'In the night where I belong'],
+        ['Moon is silver on the street', 'Hour where the lonely meet'],
+        ['Darkened hours, silent time', 'Every thought feels like a rhyme'],
+        ['Streetlights dancing on the square', 'In the night I have no care'],
+        ['Under skies of velvet light', 'I drift slowly into night'],
+      ],
+    },
+  };
+
+  function detectThemes(prompt) {
+    const p = prompt.toLowerCase();
+    const map = [
+      ['liefde', /liefde|hart|kus|romant|verliefd|samen|love|heart|kiss|romant/],
+      ['zomer',  /zomer|zon|strand|vakantie|warm|drink|drankje|cocktail|summer|sun|beach|holiday|drinks|sipping|shore/],
+      ['verdriet', /verdriet|traan|tranen|verloren|gemist|alleen|sad|cry|tears|miss|lonely|broken/],
+      ['feest',  /feest|dans|party|club|nacht uit|good time|goede tijd|fun|plezier|dance|celebrate/],
+      ['vrijheid', /vrij|reis|weg|free|road|adventure|escape/],
+      ['nacht',  /nacht|maan|donker|sterren|night|moon|dark|stars/],
+    ];
+    const found = [];
+    for (const [theme, re] of map) {
+      if (re.test(p)) found.push(theme);
+    }
+    return found;
+  }
+
+  function generateLyrics(prompt, lang) {
+    const allThemes = Object.keys(verses[lang]);
+    const detected = detectThemes(prompt);
+    const themes = detected.length ? detected : [allThemes[Math.floor(Math.random() * allThemes.length)]];
+    // Combine the verse pools of every detected theme so multi-topic prompts mix nicely.
+    const pool = themes.flatMap(t => verses[lang][t]);
+    const a = pool[Math.floor(Math.random() * pool.length)];
+    let b;
+    do { b = pool[Math.floor(Math.random() * pool.length)]; } while (b === a && pool.length > 1);
+    return [...a, ...b].join('\n');
+  }
+
+  // ---------- PRESETS ----------
+  const presets = {
+    nl: [
+      { label: '☀️ Zonnig', text: 'De zon schijnt door het raam, ik zing een lied voor jou' },
+      { label: '💔 Verdriet', text: 'Tranen vallen in de regen, mijn hart is leeg vannacht' },
+      { label: '🎧 Stoer',   text: 'Yo, check de beat, ik ben de baas in de game' },
+      { label: '🪩 Feest',   text: 'Dansen tot de zon opkomt, vannacht is van ons' },
+    ],
+    en: [
+      { label: '☀️ Sunny',   text: 'The sun is shining through my window, singing a song for you' },
+      { label: '💔 Sad',     text: 'Tears are falling in the rain, my heart is empty tonight' },
+      { label: '🎧 Tough',   text: 'Yo, check the beat, I am the boss of this game' },
+      { label: '🪩 Party',   text: 'Dancing till the sun comes up, tonight belongs to us' },
+    ],
+  };
+
+  // ---------- STATE ----------
+  let language = 'nl';
+  let mode = 'exact';
+  let selectedArtist = artists[0];
+  let selectedGenre = genres[0];
+  let voices = [];
+  let isSinging = false;
+  let keepAliveTimer = null;
+
+  // ---------- VOICES ----------
+  function loadVoices() { voices = window.speechSynthesis.getVoices(); }
+  if (typeof speechSynthesis !== 'undefined') {
+    loadVoices();
+    speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  function pickVoice(artist, langCode) {
+    if (!voices.length) return null;
+    const langPrefix = langCode.split('-')[0];
+    const sameLang = voices.filter(v => v.lang.startsWith(langPrefix));
+    const exactLang = voices.filter(v => v.lang === langCode);
+    const pool = exactLang.length ? exactLang : (sameLang.length ? sameLang : voices);
+
+    // 1) Try artist-specific name hints in the chosen language pool.
+    for (const hint of artist.hints) {
+      const m = pool.find(v => v.name.toLowerCase().includes(hint));
+      if (m) return m;
+    }
+    // 2) Fall back to a gender-matching voice.
+    const genderHints = artist.gender === 'female'
+      ? ['female', 'samantha', 'ava', 'allison', 'susan', 'karen', 'kate', 'serena',
+         'fiona', 'moira', 'tessa', 'victoria', 'martha', 'nicky', 'claire', 'ellen']
+      : ['male', 'daniel', 'alex', 'fred', 'aaron', 'arthur', 'oliver', 'thomas',
+         'rocko', 'ralph', 'reed', 'evan', 'tom', 'martin', 'xander'];
+    const g = pool.find(v => genderHints.some(h => v.name.toLowerCase().includes(h)));
+    if (g) return g;
+    // 3) Anything in the right language.
+    return pool[0] || voices[0];
+  }
+
+  // ---------- DOM ----------
+  const $ = (s) => document.querySelector(s);
+  const artistsEl = $('#artists');
+  const genresEl = $('#genres');
+  const lyricsEl = $('#lyrics');
+  const generatedEl = $('#generatedLyrics');
+  const promptEl = $('#prompt');
+  const whoEl = $('#who');
+  const lyricEl = $('#lyric');
+  const barsEl = $('#bars');
+  const presetRow = $('#presetRow');
+
+  function renderArtists() {
+    artistsEl.innerHTML = '';
+    artists.forEach(a => {
+      const c = document.createElement('button');
+      c.className = 'chip' + (a.id === selectedArtist.id ? ' active' : '');
+      c.innerHTML = `<span class="emoji">${a.emoji}</span><div><div>${a.name}</div><div class="meta">${a.meta}</div></div>`;
+      c.onclick = () => { selectedArtist = a; renderArtists(); updateWho(); };
+      artistsEl.appendChild(c);
+    });
+  }
+
+  function renderGenres() {
+    genresEl.innerHTML = '';
+    genres.forEach(g => {
+      const c = document.createElement('button');
+      c.className = 'chip' + (g.id === selectedGenre.id ? ' active' : '');
+      c.innerHTML = `<span class="emoji">${g.emoji}</span><div><div>${g.name}</div><div class="meta">${g.meta}</div></div>`;
+      c.onclick = () => { selectedGenre = g; renderGenres(); updateWho(); };
+      genresEl.appendChild(c);
+    });
+  }
+
+  function renderPresets() {
+    presetRow.innerHTML = '';
+    presets[language].forEach(p => {
+      const b = document.createElement('button');
+      b.className = 'preset';
+      b.textContent = p.label;
+      b.onclick = () => { lyricsEl.value = p.text; };
+      presetRow.appendChild(b);
+    });
+  }
+
+  function updateWho() {
+    const langLabel = language === 'nl' ? 'in 🇳🇱 NL' : 'in 🇬🇧 EN';
+    whoEl.innerHTML = `${selectedArtist.emoji} <b>${selectedArtist.name}</b> <span class="small">zingt ${langLabel} —</span> ${selectedGenre.emoji} <b>${selectedGenre.name}</b>`;
+  }
+
+  function toast(m) {
+    const t = $('#toast');
+    t.textContent = m;
+    t.classList.add('show');
+    clearTimeout(t._h);
+    t._h = setTimeout(() => t.classList.remove('show'), 1700);
+  }
+
+  function getActiveText() {
+    return mode === 'exact' ? lyricsEl.value : generatedEl.value;
+  }
+
+  // ---------- BACKING TRACK (Web Audio) ----------
+  const NOTES = { C:261.63,'C#':277.18,D:293.66,'D#':311.13,E:329.63,F:349.23,'F#':369.99,G:392.00,'G#':415.30,A:440.00,'A#':466.16,B:493.88 };
+
+  function parseChord(name) {
+    const m = name.match(/^([A-G]#?)(maj7|m7|dim|sus4|m|7)?$/);
+    if (!m) return [261.63, 329.63, 392.00];
+    const root = NOTES[m[1]] || 261.63;
+    const kind = m[2] || '';
+    const semis = [0];
+    if (kind === 'm' || kind === 'm7') semis.push(3);
+    else if (kind === 'dim') { semis.push(3); }
+    else if (kind === 'sus4') semis.push(5);
+    else semis.push(4);
+    if (kind === 'dim') semis.push(6);
+    else semis.push(7);
+    if (kind === '7' || kind === 'm7') semis.push(10);
+    else if (kind === 'maj7') semis.push(11);
+    return semis.map(s => root * Math.pow(2, s / 12));
+  }
+
+  // Per-genre backing track config: bpm, chord progression, oscillator timbre, drums.
+  const beats = {
+    pop:     { bpm: 96,  prog: ['C','G','Am','F'],         wave: 'triangle', drum: true,  bass: true,  vol: 0.07 },
+    rock:    { bpm: 116, prog: ['E','D','A','E'],          wave: 'sawtooth', drum: true,  bass: true,  vol: 0.06 },
+    opera:   { bpm: 60,  prog: ['C','F','G','C'],          wave: 'sine',     drum: false, bass: false, vol: 0.06 },
+    rap:     { bpm: 88,  prog: ['Am','Am','Dm','Am'],      wave: 'square',   drum: true,  bass: true,  vol: 0.05 },
+    ballad:  { bpm: 64,  prog: ['C','Am','F','G'],         wave: 'sine',     drum: false, bass: true,  vol: 0.06 },
+    techno:  { bpm: 124, prog: ['Am','Am','Am','Am'],      wave: 'square',   drum: true,  bass: true,  vol: 0.05 },
+    reggae:  { bpm: 76,  prog: ['C','F','G','F'],          wave: 'triangle', drum: true,  bass: true,  vol: 0.06, offbeat: true },
+    country: { bpm: 96,  prog: ['G','C','D','G'],          wave: 'triangle', drum: true,  bass: true,  vol: 0.06 },
+    jazz:    { bpm: 100, prog: ['Dm7','G7','Cmaj7','Cmaj7'], wave: 'sine',   drum: false, bass: true,  vol: 0.05 },
+    kinder:  { bpm: 108, prog: ['C','F','G','C'],          wave: 'triangle', drum: true,  bass: true,  vol: 0.06 },
+    blues:   { bpm: 60,  prog: ['E7','E7','A7','E7','B7','A7','E7','B7'], wave: 'sawtooth', drum: false, bass: true, vol: 0.06 },
+  };
+
+  // Per-genre singing chunk size. Smaller = more staccato; larger = more legato.
+  const groupSize = { rap: 1, techno: 1, blues: 3, ballad: 3, opera: 3, jazz: 3 };
+
+  let audioCtx = null;
+  let backingTimer = null;
+
+  function getCtx() {
+    if (!audioCtx) {
+      const C = window.AudioContext || window.webkitAudioContext;
+      if (C) audioCtx = new C();
+    }
+    return audioCtx;
+  }
+
+  function playChord(ctx, freqs, time, duration, wave, vol) {
+    freqs.forEach(f => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = wave;
+      osc.frequency.value = f;
+      osc.connect(gain); gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(0, time);
+      gain.gain.linearRampToValueAtTime(vol, time + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+      osc.start(time); osc.stop(time + duration + 0.05);
+    });
+  }
+
+  function playBass(ctx, freq, time, duration, vol) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq / 2;
+    osc.connect(gain); gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(vol * 1.4, time + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+    osc.start(time); osc.stop(time + duration + 0.05);
+  }
+
+  function playKick(ctx, time, vol) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.setValueAtTime(120, time);
+    osc.frequency.exponentialRampToValueAtTime(45, time + 0.12);
+    gain.gain.setValueAtTime(vol * 1.8, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(time); osc.stop(time + 0.2);
+  }
+
+  function playHat(ctx, time, vol) {
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(vol, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+    src.connect(gain); gain.connect(ctx.destination);
+    src.start(time);
+  }
+
+  function startBacking(genreId) {
+    const cfg = beats[genreId] || beats.pop;
+    const ctx = getCtx();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const beatDur = 60 / cfg.bpm;
+    let step = 0;
+
+    const tick = () => {
+      const t = ctx.currentTime + 0.04;
+      const freqs = parseChord(cfg.prog[step % cfg.prog.length]);
+      if (cfg.offbeat) {
+        playChord(ctx, freqs, t + beatDur * 0.5, beatDur * 0.4, cfg.wave, cfg.vol);
+      } else {
+        playChord(ctx, freqs, t, beatDur * 0.85, cfg.wave, cfg.vol);
+      }
+      if (cfg.bass) playBass(ctx, freqs[0], t, beatDur * 0.45, cfg.vol);
+      if (cfg.drum) {
+        playKick(ctx, t, cfg.vol);
+        playHat(ctx, t + beatDur * 0.5, cfg.vol * 0.7);
+      }
+      step++;
+    };
+    tick();
+    backingTimer = setInterval(tick, beatDur * 1000);
+  }
+
+  function stopBacking() {
+    if (backingTimer) { clearInterval(backingTimer); backingTimer = null; }
+  }
+
+  // ---------- SING ----------
+  function syllabify(text) {
+    const words = text.replace(/\n/g, ' ').trim().split(/\s+/);
+    const result = [];
+    words.forEach((w, wi) => {
+      const parts = w.match(/[^aeiouyAEIOUY]*[aeiouyAEIOUY]+(?:[^aeiouyAEIOUY]*$|[^aeiouyAEIOUY](?=[^aeiouyAEIOUY]))?/g);
+      const sylls = (parts && parts.length) ? parts : [w];
+      sylls.forEach((s, si) => {
+        result.push({ text: s, isLast: si === sylls.length - 1, wordIndex: wi });
+      });
+    });
+    return result;
+  }
+
+  function renderLyric(syllables) {
+    lyricEl.innerHTML = '';
+    let lastWord = -1;
+    syllables.forEach((s, i) => {
+      if (s.wordIndex !== lastWord && lastWord !== -1) {
+        lyricEl.appendChild(document.createTextNode(' '));
+      }
+      lastWord = s.wordIndex;
+      const span = document.createElement('span');
+      span.className = 'syl';
+      span.dataset.idx = i;
+      span.textContent = s.text;
+      lyricEl.appendChild(span);
+    });
+  }
+
+  function highlightSyllable(idx) {
+    document.querySelectorAll('.syl').forEach(el => el.classList.remove('on'));
+    const el = document.querySelector(`.syl[data-idx="${idx}"]`);
+    if (el) {
+      el.classList.add('on');
+      el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
+  }
+
+  // Group words into singing chunks. Honours line breaks and punctuation as natural pauses.
+  function groupIntoChunks(text, size) {
+    const lines = text.replace(/\n+/g, '\n').split('\n');
+    const chunks = [];
+    lines.forEach(line => {
+      const subs = line.split(/([,;])/).map(s => s.trim()).filter(Boolean);
+      subs.forEach(sub => {
+        if (sub === ',' || sub === ';') return;
+        const ws = sub.split(/\s+/);
+        for (let i = 0; i < ws.length; i += size) {
+          chunks.push(ws.slice(i, i + size).join(' '));
+        }
+      });
+    });
+    return chunks;
+  }
+
+  function sing() {
+    if (!('speechSynthesis' in window)) { toast('Spraak niet ondersteund 😔'); return; }
+    const text = getActiveText().trim();
+    if (!text) { toast('Schrijf of genereer eerst een tekst!'); return; }
+
+    speechSynthesis.cancel();
+    if (!voices.length) loadVoices();
+
+    const allSyllables = syllabify(text);
+    if (!allSyllables.length) return;
+    renderLyric(allSyllables);
+    barsEl.classList.add('on');
+    isSinging = true;
+
+    // Kick off the backing track first so audio begins immediately.
+    startBacking(selectedGenre.id);
+
+    const langCode = language === 'nl' ? 'nl-NL' : (selectedArtist.defaultLang.startsWith('en') ? selectedArtist.defaultLang : 'en-US');
+    const voice = pickVoice(selectedArtist, langCode);
+    const melody = selectedGenre.melody;
+    const size = groupSize[selectedGenre.id] || 2;
+    const chunks = groupIntoChunks(text, size);
+
+    // Map each chunk to its syllable index range so we can highlight along.
+    let cursor = 0;
+    const chunkInfo = chunks.map(c => {
+      const n = syllabify(c).length || 1;
+      const start = cursor;
+      cursor += n;
+      return { text: c, start, count: n };
+    });
+
+    // Queue all utterances upfront — Web Speech plays them back-to-back without the
+    // setTimeout gaps that made the old per-syllable version sound choppy.
+    chunkInfo.forEach((info, ci) => {
+      const u = new SpeechSynthesisUtterance(info.text);
+      if (voice) u.voice = voice;
+      u.lang = langCode;
+      const melodyMul = melody[ci % melody.length];
+      u.pitch = Math.max(0.1, Math.min(2, selectedArtist.pitch * melodyMul));
+      u.rate = Math.max(0.1, Math.min(3, selectedArtist.rate * selectedGenre.rateMul));
+      u.volume = 1;
+
+      u.onstart = () => {
+        if (!isSinging) return;
+        // Animate highlighting through this chunk's syllables.
+        const startTime = performance.now();
+        const estDur = Math.max(0.25, info.text.length / (12 * u.rate));
+        const animate = () => {
+          if (!isSinging) return;
+          const elapsed = (performance.now() - startTime) / 1000;
+          const progress = Math.min(1, elapsed / estDur);
+          const idx = Math.min(info.count - 1, Math.floor(progress * info.count));
+          highlightSyllable(info.start + idx);
+          if (progress < 1) requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate);
+      };
+
+      if (ci === chunkInfo.length - 1) {
+        u.onend = () => {
+          isSinging = false;
+          stopBacking();
+          barsEl.classList.remove('on');
+          document.querySelectorAll('.syl').forEach(el => el.classList.remove('on'));
+        };
+      }
+      speechSynthesis.speak(u);
+    });
+
+    // Chrome/Edge silently pause speech after ~15s. Pump pause/resume to keep it alive.
+    if (keepAliveTimer) clearInterval(keepAliveTimer);
+    keepAliveTimer = setInterval(() => {
+      if (!isSinging) { clearInterval(keepAliveTimer); keepAliveTimer = null; return; }
+      if (speechSynthesis.speaking) {
+        speechSynthesis.pause();
+        speechSynthesis.resume();
+      }
+    }, 9000);
+  }
+
+  function stop() {
+    isSinging = false;
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    stopBacking();
+    if (keepAliveTimer) { clearInterval(keepAliveTimer); keepAliveTimer = null; }
+    barsEl.classList.remove('on');
+    document.querySelectorAll('.syl').forEach(el => el.classList.remove('on'));
+  }
+
+  // ---------- EVENTS ----------
+  $('#singBtn').onclick = sing;
+  $('#stopBtn').onclick = stop;
+
+  document.querySelectorAll('#langToggle button').forEach(b => {
+    b.onclick = () => {
+      language = b.dataset.lang;
+      document.querySelectorAll('#langToggle button').forEach(x => x.classList.toggle('active', x === b));
+      renderPresets();
+      updateWho();
+    };
+  });
+
+  document.querySelectorAll('#modeTabs button').forEach(b => {
+    b.onclick = () => {
+      mode = b.dataset.mode;
+      document.querySelectorAll('#modeTabs button').forEach(x => x.classList.toggle('active', x === b));
+      $('#exactPanel').classList.toggle('hidden', mode !== 'exact');
+      $('#promptPanel').classList.toggle('hidden', mode !== 'prompt');
+    };
+  });
+
+  $('#genBtn').onclick = () => {
+    const p = promptEl.value.trim();
+    if (!p) { toast('Geef eerst een prompt op!'); return; }
+    generatedEl.value = generateLyrics(p, language);
+    toast('🎵 Lyrics gegenereerd!');
+  };
+
+  // ---------- INIT ----------
+  renderArtists();
+  renderGenres();
+  renderPresets();
+  updateWho();
+
+  // Expose stop() so the top-level tab switcher can halt singing on tab change.
+  window.__zingStop = stop;
+})();
+</script>
+
+<script>
+(function() {
+  // ---------- FASHION GAME ----------
+  const root = document.getElementById('fashion-app');
+  const $ = (sel) => root.querySelector(sel);
+
+  const wardrobe = {
+    top: [
+      { e: '👕', name: 'Wit T-shirt',     color: '#fafafa', family: 'neutral', style: 'casual', trend: 7 },
+      { e: '👚', name: 'Roze blouse',     color: '#ff8fb8', family: 'warm',    style: 'chique', trend: 8 },
+      { e: '🧥', name: 'Bruine jas',      color: '#8a5a3b', family: 'warm',    style: 'chique', trend: 7 },
+      { e: '🥼', name: 'Witte coat',      color: '#f3eede', family: 'neutral', style: 'chique', trend: 6 },
+      { e: '🎽', name: 'Sport top',       color: '#ff4f4f', family: 'bright',  style: 'sport',  trend: 6 },
+      { e: '👔', name: 'Blauw overhemd',  color: '#5a7fff', family: 'cool',    style: 'chique', trend: 7 },
+      { e: '🩱', name: 'Zwart topje',     color: '#222',    family: 'neutral', style: 'casual', trend: 8 },
+      { e: '🦺', name: 'Geel vest',       color: '#ffd84a', family: 'bright',  style: 'street', trend: 9 },
+    ],
+    bottom: [
+      { e: '👖', name: 'Spijkerbroek',    color: '#3b6fa0', family: 'cool',    style: 'casual', trend: 8 },
+      { e: '🩳', name: 'Korte broek',     color: '#5fb8a8', family: 'cool',    style: 'sport',  trend: 6 },
+      { e: '👗', name: 'Zomerjurk',       color: '#ff8fb8', family: 'warm',    style: 'chique', trend: 9 },
+      { e: '🩲', name: 'Zwemshort',       color: '#ff7a3d', family: 'warm',    style: 'sport',  trend: 5 },
+      { e: '👘', name: 'Lange jurk',      color: '#8a4fff', family: 'cool',    style: 'chique', trend: 8 },
+      { e: '🪡', name: 'Leren broek',     color: '#222',    family: 'neutral', style: 'street', trend: 8 },
+    ],
+    shoes: [
+      { e: '👟', name: 'Sneakers',        color: '#fafafa', family: 'neutral', style: 'casual', trend: 8 },
+      { e: '👠', name: 'Hakken',          color: '#cc1f3d', family: 'bright',  style: 'chique', trend: 9 },
+      { e: '👢', name: 'Laarzen',         color: '#5a3a22', family: 'warm',    style: 'street', trend: 7 },
+      { e: '🥾', name: 'Bergschoenen',    color: '#6a4a2b', family: 'warm',    style: 'sport',  trend: 5 },
+      { e: '🩴', name: 'Slippers',        color: '#5fb8e8', family: 'cool',    style: 'casual', trend: 5 },
+      { e: '🥿', name: 'Ballerina',       color: '#ffb6c1', family: 'warm',    style: 'chique', trend: 7 },
+    ],
+    acc: [
+      { e: '👜', name: 'Handtas',         color: '#cc6699', family: 'warm',    style: 'chique', trend: 8 },
+      { e: '🎒', name: 'Rugzak',          color: '#3b6fa0', family: 'cool',    style: 'casual', trend: 7 },
+      { e: '👒', name: 'Hoed',            color: '#f3eede', family: 'neutral', style: 'chique', trend: 8 },
+      { e: '🧢', name: 'Pet',             color: '#222',    family: 'neutral', style: 'street', trend: 7 },
+      { e: '🕶️', name: 'Zonnebril',      color: '#222',    family: 'neutral', style: 'street', trend: 9 },
+      { e: '⌚', name: 'Horloge',         color: '#c0c0c0', family: 'neutral', style: 'chique', trend: 7 },
+      { e: '💍', name: 'Ring',            color: '#ffd84a', family: 'bright',  style: 'chique', trend: 6 },
+      { e: '👑', name: 'Kroon',           color: '#ffd84a', family: 'bright',  style: 'chique', trend: 10 },
+    ],
+  };
+
+  const tabConfig = [
+    { key: 'top',    label: '👕 Top' },
+    { key: 'bottom', label: '👖 Broek' },
+    { key: 'shoes',  label: '👟 Schoenen' },
+    { key: 'acc',    label: '👜 Accessoire' },
+  ];
+
+  // Each dress code defines a target style + color family. The score rewards
+  // matching items; the AI stylist picks items that fit the same code.
+  const dressCodes = [
+    { emoji: '🌅', name: 'Beach Casual',  style: 'casual', family: 'warm',    hint: 'Zomer-relaxed, warme tinten' },
+    { emoji: '🎩', name: 'Black Tie',     style: 'chique', family: 'neutral', hint: 'Klassiek formeel, ingetogen' },
+    { emoji: '🏃', name: 'Sportief',      style: 'sport',  family: 'bright',  hint: 'Actief & energiek' },
+    { emoji: '🧢', name: 'Streetwear',    style: 'street', family: 'neutral', hint: 'Urban edge, zwart-wit basis' },
+    { emoji: '💖', name: 'Romantisch',    style: 'chique', family: 'warm',    hint: 'Zacht, lieflijk, roze tinten' },
+    { emoji: '❄️', name: 'Winter Chic',   style: 'chique', family: 'cool',    hint: 'Koel & elegant blauw' },
+    { emoji: '☀️', name: 'Summer Vibes',  style: 'casual', family: 'bright',  hint: 'Vrolijk & zonnig fel' },
+    { emoji: '🤘', name: 'Rock Edgy',     style: 'street', family: 'bright',  hint: 'Stoer & opvallend' },
+    { emoji: '💼', name: 'Business',      style: 'chique', family: 'cool',    hint: 'Professioneel en strak' },
+    { emoji: '🎨', name: 'Casual Cool',   style: 'casual', family: 'neutral', hint: 'Tijdloos clean' },
+  ];
+  const familyLabels = { warm: 'warm', cool: 'koel', neutral: 'neutraal', bright: 'fel' };
+  const styleLabels  = { casual: 'casual', chique: 'chique', sport: 'sportief', street: 'street' };
+
+  let activeTab = 'top';
+  let currentDressCode = dressCodes[0];
+  const outfit = { top: null, bottom: null, shoes: null, acc: null };
+
+  function pickDressCode() {
+    const choice = dressCodes[Math.floor(Math.random() * dressCodes.length)];
+    currentDressCode = choice;
+    $('#fg-dcEmoji').textContent = choice.emoji;
+    $('#fg-dcName').textContent = choice.name;
+    $('#fg-dcHint').textContent = choice.hint;
+    $('#fg-dcTags').textContent = `Stijl: ${styleLabels[choice.style]} • Kleur: ${familyLabels[choice.family]}`;
+  }
+
+  const tabsEl = $('#fg-tabs');
+  const itemsEl = $('#fg-items');
+  const livePill = $('#fg-livePill');
+
+  function showScreen(id) {
+    root.querySelectorAll('.fg-screen').forEach(s => s.classList.remove('active'));
+    root.querySelector('#fg-' + id).classList.add('active');
+  }
+
+  function toast(msg) {
+    const t = $('#fg-toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._h);
+    t._h = setTimeout(() => t.classList.remove('show'), 1400);
+  }
+
+  function renderTabs() {
+    tabsEl.innerHTML = '';
+    tabConfig.forEach(t => {
+      const b = document.createElement('button');
+      b.className = 'fg-tab' + (t.key === activeTab ? ' active' : '');
+      b.textContent = t.label;
+      b.onclick = () => { activeTab = t.key; renderTabs(); renderItems(); };
+      tabsEl.appendChild(b);
+    });
+  }
+
+  function renderItems() {
+    itemsEl.innerHTML = '';
+    wardrobe[activeTab].forEach((it, idx) => {
+      const d = document.createElement('div');
+      d.className = 'item' + (outfit[activeTab] && outfit[activeTab].idx === idx ? ' selected' : '');
+      d.innerHTML = `<span>${it.e}</span><span class="swatch" style="background:${it.color}"></span>`;
+      d.title = it.name;
+      d.onclick = () => selectItem(activeTab, idx);
+      itemsEl.appendChild(d);
+    });
+  }
+
+  function selectItem(slot, idx) {
+    const it = wardrobe[slot][idx];
+    outfit[slot] = { ...it, idx };
+    const slotEl = root.querySelector(`.slot[data-slot="${slot}"]`);
+    slotEl.classList.remove('empty');
+    slotEl.classList.add('filled');
+    slotEl.textContent = it.e;
+    slotEl.style.color = it.color;
+    slotEl.style.animation = 'none';
+    void slotEl.offsetWidth;
+    slotEl.style.animation = '';
+    renderItems();
+    updateLiveScore();
+  }
+
+  function resetOutfit() {
+    Object.keys(outfit).forEach(k => {
+      outfit[k] = null;
+      const s = root.querySelector(`.slot[data-slot="${k}"]`);
+      s.classList.add('empty');
+      s.classList.remove('filled');
+      s.style.color = '';
+      s.textContent = k === 'top' ? 'Top' : k === 'bottom' ? 'Broek' : k === 'shoes' ? 'Schoenen' : '+';
+    });
+    renderItems();
+    updateLiveScore();
+  }
+
+  // Score against the active dress code. Style match and color match each cap at 30,
+  // trend at 15, completeness at 25 — total 100.
+  function score(o, dc = currentDressCode) {
+    const parts = [o.top, o.bottom, o.shoes, o.acc].filter(Boolean);
+    if (parts.length === 0) return { total: 0, style: 0, color: 0, trend: 0, complete: 0 };
+
+    const styleMatches = parts.filter(p => p.style === dc.style).length;
+    const styleScore = Math.round((styleMatches / parts.length) * 30);
+
+    // Neutrals partially blend with any family.
+    const colorMatches = parts.reduce((sum, p) => {
+      if (p.family === dc.family) return sum + 1;
+      if (p.family === 'neutral' || dc.family === 'neutral') return sum + 0.5;
+      return sum;
+    }, 0);
+    const colorScore = Math.round((colorMatches / parts.length) * 30);
+
+    const trendAvg = parts.reduce((s, p) => s + p.trend, 0) / parts.length;
+    const trendScore = Math.round(trendAvg * 1.5);
+    const complete = parts.length === 4 ? 25 : parts.length * 5;
+
+    const total = styleScore + colorScore + trendScore + complete;
+    return { total, style: styleScore, color: colorScore, trend: trendScore, complete };
+  }
+
+  function updateLiveScore() {
+    livePill.textContent = `Score: ${score(outfit).total}`;
+  }
+
+  function generateAiOutfit(dc = currentDressCode) {
+    function pickFor(slot) {
+      const pool = wardrobe[slot];
+      const ranked = pool.map((it, idx) => {
+        let s = it.trend;
+        if (it.style === dc.style) s += 6;
+        if (it.family === dc.family) s += 5;
+        else if (it.family === 'neutral') s += 2;
+        return { it, idx, s };
+      }).sort((a, b) => b.s - a.s);
+      // Top 2 to add a little variety, but the AI mostly nails the code.
+      const choice = ranked[Math.floor(Math.random() * Math.min(2, ranked.length))];
+      return { ...choice.it, idx: choice.idx };
+    }
+    return {
+      top: pickFor('top'),
+      bottom: pickFor('bottom'),
+      shoes: pickFor('shoes'),
+      acc: pickFor('acc'),
+    };
+  }
+
+  function judge() {
+    const filled = Object.values(outfit).filter(Boolean).length;
+    if (filled < 3) { toast('Kies minstens 3 onderdelen!'); return; }
+
+    const you = score(outfit);
+    const ai = generateAiOutfit();
+    const aiScore = score(ai);
+
+    $('#fg-stackYou').textContent = ['top','bottom','shoes','acc'].map(k => outfit[k]?.e || '·').join('');
+    $('#fg-ptsYou').textContent = you.total;
+    $('#fg-stackAi').textContent = [ai.top.e, ai.bottom.e, ai.shoes.e, ai.acc.e].join('');
+    $('#fg-ptsAi').textContent = aiScore.total;
+
+    $('#fg-cardYou').classList.toggle('winner', you.total >= aiScore.total);
+    $('#fg-cardAi').classList.toggle('winner', aiScore.total > you.total);
+
+    let emoji, text;
+    if (you.total > aiScore.total) { emoji = '🏆'; text = 'Jij wint! Stijlicoon!'; }
+    else if (you.total === aiScore.total) { emoji = '🤝'; text = 'Gelijkspel — sterke look!'; }
+    else { emoji = '💅'; text = 'Stylist wint deze ronde'; }
+    $('#fg-verdictEmoji').textContent = emoji;
+    $('#fg-verdictText').textContent = text;
+
+    $('#fg-breakdown').innerHTML = `
+      <h3>${currentDressCode.emoji} Dress code: ${currentDressCode.name}</h3>
+      <div class="br-row"><span>✨ Stijlmatch (${styleLabels[currentDressCode.style]})</span><span>${you.style}/30</span></div>
+      <div class="br-row"><span>🎨 Kleurmatch (${familyLabels[currentDressCode.family]})</span><span>${you.color}/30</span></div>
+      <div class="br-row"><span>🔥 Trendscore</span><span>${you.trend}/15</span></div>
+      <div class="br-row"><span>👗 Compleetheid</span><span>${you.complete}/25</span></div>
+      <div class="br-row" style="border-top:1px solid rgba(0,0,0,0.1); margin-top:6px; padding-top:8px;">
+        <span><b>Totaal</b></span><span><b>${you.total}/100</b></span>
+      </div>
+    `;
+    showScreen('result');
+  }
+
+  function startNewGame() {
+    pickDressCode();
+    resetOutfit();
+    showScreen('game');
+  }
+
+  $('#fg-startBtn').onclick = startNewGame;
+  $('#fg-resetBtn').onclick = resetOutfit;
+  $('#fg-judgeBtn').onclick = judge;
+  $('#fg-playAgainBtn').onclick = startNewGame;
+
+  renderTabs();
+  renderItems();
+})();
+</script>
+</body>
+</html>
