@@ -17,19 +17,50 @@
     overflow: hidden;
   }
   body {
-    background:
-      radial-gradient(circle at 20% 10%, rgba(255,79,139,0.35), transparent 40%),
-      radial-gradient(circle at 80% 80%, rgba(79,195,255,0.30), transparent 45%),
-      radial-gradient(circle at 50% 50%, rgba(138,79,255,0.25), transparent 60%),
-      #0d0820;
+    background: #0d0820;
   }
-  #app {
+  #root {
     height: 100dvh;
     max-width: 480px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
+  }
+  #topTabs {
+    display: flex;
+    gap: 6px;
+    padding: calc(env(safe-area-inset-top) + 6px) 10px 6px;
+    background: #0d0820;
+    flex-shrink: 0;
+    z-index: 5;
+  }
+  #topTabs button {
+    flex: 1;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #f0e9ff;
+    padding: 9px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  #topTabs button.active {
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(138, 79, 255, 0.4);
+  }
+  .app { display: none; flex: 1; min-height: 0; flex-direction: column; }
+  .app.active { display: flex; }
+  #sing-app {
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,79,139,0.35), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(79,195,255,0.30), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(138,79,255,0.25), transparent 60%),
+      #0d0820;
+    padding: 0 12px env(safe-area-inset-bottom);
+    color: #f0e9ff;
   }
   header {
     text-align: center;
@@ -332,10 +363,212 @@
   .toast.show { opacity: 1; }
 
   .hidden { display: none !important; }
+
+  /* ====== FASHION GAME (scoped) ====== */
+  #fashion-app {
+    background: linear-gradient(160deg, #ffd1e1 0%, #c8b6ff 50%, #b8e1ff 100%);
+    color: #2a1a3a;
+  }
+  #fashion-app .fg-screen { flex: 1; display: none; flex-direction: column; min-height: 0; }
+  #fashion-app .fg-screen.active { display: flex; }
+  #fashion-app .fg-header { text-align: center; padding: 8px 12px 4px; }
+  #fashion-app .fg-header h1 {
+    font-size: 22px; font-weight: 800; letter-spacing: 0.5px;
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  #fashion-app .fg-header p { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+
+  #fashion-app .home-inner {
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    padding: 24px; gap: 18px;
+  }
+  #fashion-app .logo {
+    font-size: 72px;
+    filter: drop-shadow(0 8px 14px rgba(255, 79, 139, 0.4));
+    animation: fg-float 3s ease-in-out infinite;
+  }
+  @keyframes fg-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  #fashion-app .home-inner h2 { font-size: 26px; font-weight: 900; line-height: 1.1; }
+  #fashion-app .home-inner p { font-size: 14px; opacity: 0.75; max-width: 300px; line-height: 1.5; }
+
+  #fashion-app .fg-btn {
+    border: none;
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    color: white; padding: 14px 28px;
+    font-size: 16px; font-weight: 700; border-radius: 999px;
+    box-shadow: 0 8px 22px rgba(138, 79, 255, 0.4);
+    cursor: pointer; transition: transform 0.15s ease;
+  }
+  #fashion-app .fg-btn:active { transform: scale(0.96); }
+  #fashion-app .fg-btn.secondary {
+    background: rgba(255,255,255,0.7); color: #2a1a3a;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  }
+
+  #fashion-app .mannequin-wrap {
+    position: relative; flex: 1 1 38%; min-height: 200px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 6px 12px;
+  }
+  #fashion-app .mannequin {
+    position: relative; width: 150px; height: 100%; max-height: 300px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  #fashion-app .head {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: linear-gradient(160deg, #ffd6b8, #f5b890);
+    box-shadow: inset -6px -6px 12px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: -8px; position: relative; z-index: 1;
+  }
+  #fashion-app .head::before, #fashion-app .head::after {
+    content: ''; position: absolute; top: 24px;
+    width: 5px; height: 5px; background: #2a1a3a; border-radius: 50%;
+  }
+  #fashion-app .head::before { left: 18px; }
+  #fashion-app .head::after { right: 18px; }
+  #fashion-app .smile {
+    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+    width: 18px; height: 8px; border-bottom: 2px solid #2a1a3a;
+    border-radius: 0 0 9px 9px;
+  }
+  #fashion-app .body-zone {
+    width: 110px; aspect-ratio: 1 / 2.2; position: relative;
+    background: rgba(255,255,255,0.35); border-radius: 18px;
+    backdrop-filter: blur(6px); box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  }
+  #fashion-app .slot {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; transition: transform 0.25s ease;
+  }
+  #fashion-app .slot.empty {
+    font-size: 11px; color: rgba(42,26,58,0.4);
+    border: 2px dashed rgba(42,26,58,0.25);
+    border-radius: 12px; width: 70%; text-align: center;
+  }
+  #fashion-app .slot.filled { animation: fg-pop 0.35s ease; }
+  @keyframes fg-pop {
+    0% { transform: translateX(-50%) scale(0.4); }
+    60% { transform: translateX(-50%) scale(1.15); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+  #fashion-app .slot-top    { top: 6%;  height: 38%; width: 80%; }
+  #fashion-app .slot-bottom { top: 46%; height: 36%; width: 76%; }
+  #fashion-app .slot-shoes  { top: 84%; height: 14%; width: 60%; font-size: 26px; }
+  #fashion-app .slot-acc    { top: -10%; right: -18px; left: auto; transform: none; height: 36px; width: 36px; font-size: 22px; }
+  #fashion-app .slot-acc.empty { font-size: 10px; }
+  #fashion-app .score-pill {
+    position: absolute; top: 8px; left: 8px;
+    background: rgba(255,255,255,0.85);
+    padding: 6px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; color: #8a4fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  #fashion-app .picker {
+    flex: 1 1 62%;
+    background: rgba(255,255,255,0.6); backdrop-filter: blur(10px);
+    border-radius: 24px 24px 0 0; padding: 10px 12px env(safe-area-inset-bottom);
+    display: flex; flex-direction: column; min-height: 0;
+    box-shadow: 0 -6px 22px rgba(0,0,0,0.08);
+  }
+  #fashion-app .fg-tabs {
+    display: flex; gap: 6px; margin-bottom: 8px;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  #fashion-app .fg-tabs::-webkit-scrollbar { display: none; }
+  #fashion-app .fg-tab {
+    flex: 1 0 auto; padding: 7px 12px; border-radius: 999px;
+    background: rgba(255,255,255,0.7); font-size: 12px;
+    font-weight: 600; border: none; cursor: pointer;
+    color: #2a1a3a; white-space: nowrap; transition: all 0.15s ease;
+  }
+  #fashion-app .fg-tab.active {
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    color: white; box-shadow: 0 4px 10px rgba(138, 79, 255, 0.35);
+  }
+  #fashion-app .items {
+    flex: 1; display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; overflow-y: auto; padding: 4px 2px 8px; align-content: start;
+  }
+  #fashion-app .item {
+    aspect-ratio: 1; background: white; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; cursor: pointer; border: 2px solid transparent;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06); position: relative;
+    transition: transform 0.12s ease, border-color 0.12s ease;
+  }
+  #fashion-app .item:active { transform: scale(0.92); }
+  #fashion-app .item.selected {
+    border-color: #ff4f8b;
+    box-shadow: 0 0 0 3px rgba(255,79,139,0.2), 0 4px 10px rgba(255,79,139,0.25);
+  }
+  #fashion-app .item .swatch {
+    position: absolute; bottom: 4px; right: 4px;
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 1.5px solid white; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+  #fashion-app .actions { display: flex; gap: 8px; margin-top: 6px; }
+  #fashion-app .actions .fg-btn { flex: 1; padding: 11px; font-size: 14px; }
+
+  #fashion-app .result-inner {
+    flex: 1; overflow-y: auto; padding: 14px;
+    display: flex; flex-direction: column; gap: 12px; align-items: center;
+  }
+  #fashion-app .verdict { font-size: 44px; text-align: center; animation: fg-pop 0.5s ease; }
+  #fashion-app .verdict-text {
+    font-size: 24px; font-weight: 900; text-align: center;
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  #fashion-app .vs-row { display: flex; gap: 10px; width: 100%; align-items: stretch; }
+  #fashion-app .outfit-card {
+    flex: 1; background: rgba(255,255,255,0.75);
+    border-radius: 18px; padding: 12px 8px; text-align: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+  }
+  #fashion-app .outfit-card.winner {
+    background: linear-gradient(160deg, #fff4cf, #ffd6e0);
+    box-shadow: 0 6px 20px rgba(255,179,71,0.4);
+    transform: scale(1.03);
+  }
+  #fashion-app .outfit-card .label { font-size: 12px; opacity: 0.7; font-weight: 600; }
+  #fashion-app .outfit-card .stack { font-size: 26px; line-height: 1.05; margin: 6px 0; }
+  #fashion-app .outfit-card .pts { font-size: 22px; font-weight: 900; color: #8a4fff; }
+  #fashion-app .breakdown {
+    width: 100%; background: rgba(255,255,255,0.65);
+    border-radius: 16px; padding: 12px 14px; font-size: 13px;
+  }
+  #fashion-app .breakdown h3 { font-size: 14px; margin-bottom: 8px; }
+  #fashion-app .br-row { display: flex; justify-content: space-between; padding: 4px 0; }
+  #fashion-app .br-row span:last-child { font-weight: 700; color: #8a4fff; }
+  #fashion-app .vs-badge {
+    align-self: center; font-weight: 900; font-size: 14px;
+    color: #ff4f8b; padding: 4px 10px; background: white;
+    border-radius: 999px; box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+  #fashion-app .fg-toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: rgba(42,26,58,0.92); color: white;
+    padding: 10px 18px; border-radius: 999px;
+    font-size: 13px; font-weight: 600;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 100;
+  }
+  #fashion-app .fg-toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
 </style>
 </head>
 <body>
-<div id="app">
+<div id="root">
+  <nav id="topTabs">
+    <button class="active" data-app="sing">🎤 Zingen</button>
+    <button data-app="fashion">👗 Mode Spel</button>
+  </nav>
+
+<div id="sing-app" class="app active">
   <header>
     <h1>🎤 ZING-O-MATIC</h1>
     <p>Kies artiest, taal, genre & tekst</p>
@@ -401,7 +634,86 @@
   <div class="toast" id="toast"></div>
 </div>
 
+<div id="fashion-app" class="app">
+  <header class="fg-header">
+    <h1>Mode Spel</h1>
+    <p>Stel jouw perfecte outfit samen</p>
+  </header>
+
+  <section class="fg-screen active" id="fg-home">
+    <div class="home-inner">
+      <div class="logo">👗</div>
+      <h2>Word jij<br/>de stijlkoning(in)?</h2>
+      <p>Mix tops, broeken, schoenen en accessoires. De beste look wint van de stylist!</p>
+      <button class="fg-btn" id="fg-startBtn">Start spel ✨</button>
+    </div>
+  </section>
+
+  <section class="fg-screen" id="fg-game">
+    <div class="mannequin-wrap">
+      <div class="score-pill" id="fg-livePill">Score: 0</div>
+      <div class="mannequin">
+        <div class="head"><div class="smile"></div></div>
+        <div class="body-zone">
+          <div class="slot slot-top empty" data-slot="top">Top</div>
+          <div class="slot slot-bottom empty" data-slot="bottom">Broek</div>
+          <div class="slot slot-shoes empty" data-slot="shoes">Schoenen</div>
+          <div class="slot slot-acc empty" data-slot="acc">+</div>
+        </div>
+      </div>
+    </div>
+    <div class="picker">
+      <div class="fg-tabs" id="fg-tabs"></div>
+      <div class="items" id="fg-items"></div>
+      <div class="actions">
+        <button class="fg-btn secondary" id="fg-resetBtn">Wis</button>
+        <button class="fg-btn" id="fg-judgeBtn">Beoordeel 🏆</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="fg-screen" id="fg-result">
+    <div class="result-inner">
+      <div class="verdict" id="fg-verdictEmoji">🎉</div>
+      <div class="verdict-text" id="fg-verdictText">Geweldig!</div>
+      <div class="vs-row">
+        <div class="outfit-card" id="fg-cardYou">
+          <div class="label">JIJ</div>
+          <div class="stack" id="fg-stackYou"></div>
+          <div class="pts" id="fg-ptsYou">0</div>
+        </div>
+        <div class="vs-badge">VS</div>
+        <div class="outfit-card" id="fg-cardAi">
+          <div class="label">STYLIST</div>
+          <div class="stack" id="fg-stackAi"></div>
+          <div class="pts" id="fg-ptsAi">0</div>
+        </div>
+      </div>
+      <div class="breakdown" id="fg-breakdown"></div>
+      <button class="fg-btn" id="fg-playAgainBtn">Opnieuw spelen 🔁</button>
+    </div>
+  </section>
+
+  <div class="fg-toast" id="fg-toast"></div>
+</div>
+
+</div><!-- /#root -->
+
 <script>
+  // Top-level tab switcher: shows the active app, hides the other.
+  document.querySelectorAll('#topTabs button').forEach(b => {
+    b.onclick = () => {
+      const app = b.dataset.app;
+      document.querySelectorAll('#topTabs button').forEach(x => x.classList.toggle('active', x === b));
+      document.querySelectorAll('.app').forEach(a => a.classList.toggle('active', a.id === app + '-app'));
+      // Stop singing if user navigates away from the singing app.
+      if (app !== 'sing' && window.__zingStop) window.__zingStop();
+    };
+  });
+</script>
+
+<script>
+(function() {
   // ---------- ARTISTS ----------
   // Voice hints are ranked by preference. They're matched against the available voice
   // names on the device, restricted to the currently selected language.
@@ -1035,6 +1347,234 @@
   renderGenres();
   renderPresets();
   updateWho();
+
+  // Expose stop() so the top-level tab switcher can halt singing on tab change.
+  window.__zingStop = stop;
+})();
+</script>
+
+<script>
+(function() {
+  // ---------- FASHION GAME ----------
+  const root = document.getElementById('fashion-app');
+  const $ = (sel) => root.querySelector(sel);
+
+  const wardrobe = {
+    top: [
+      { e: '👕', name: 'Wit T-shirt',     color: '#fafafa', family: 'neutral', style: 'casual', trend: 7 },
+      { e: '👚', name: 'Roze blouse',     color: '#ff8fb8', family: 'warm',    style: 'chique', trend: 8 },
+      { e: '🧥', name: 'Bruine jas',      color: '#8a5a3b', family: 'warm',    style: 'chique', trend: 7 },
+      { e: '🥼', name: 'Witte coat',      color: '#f3eede', family: 'neutral', style: 'chique', trend: 6 },
+      { e: '🎽', name: 'Sport top',       color: '#ff4f4f', family: 'bright',  style: 'sport',  trend: 6 },
+      { e: '👔', name: 'Blauw overhemd',  color: '#5a7fff', family: 'cool',    style: 'chique', trend: 7 },
+      { e: '🩱', name: 'Zwart topje',     color: '#222',    family: 'neutral', style: 'casual', trend: 8 },
+      { e: '🦺', name: 'Geel vest',       color: '#ffd84a', family: 'bright',  style: 'street', trend: 9 },
+    ],
+    bottom: [
+      { e: '👖', name: 'Spijkerbroek',    color: '#3b6fa0', family: 'cool',    style: 'casual', trend: 8 },
+      { e: '🩳', name: 'Korte broek',     color: '#5fb8a8', family: 'cool',    style: 'sport',  trend: 6 },
+      { e: '👗', name: 'Zomerjurk',       color: '#ff8fb8', family: 'warm',    style: 'chique', trend: 9 },
+      { e: '🩲', name: 'Zwemshort',       color: '#ff7a3d', family: 'warm',    style: 'sport',  trend: 5 },
+      { e: '👘', name: 'Lange jurk',      color: '#8a4fff', family: 'cool',    style: 'chique', trend: 8 },
+      { e: '🪡', name: 'Leren broek',     color: '#222',    family: 'neutral', style: 'street', trend: 8 },
+    ],
+    shoes: [
+      { e: '👟', name: 'Sneakers',        color: '#fafafa', family: 'neutral', style: 'casual', trend: 8 },
+      { e: '👠', name: 'Hakken',          color: '#cc1f3d', family: 'bright',  style: 'chique', trend: 9 },
+      { e: '👢', name: 'Laarzen',         color: '#5a3a22', family: 'warm',    style: 'street', trend: 7 },
+      { e: '🥾', name: 'Bergschoenen',    color: '#6a4a2b', family: 'warm',    style: 'sport',  trend: 5 },
+      { e: '🩴', name: 'Slippers',        color: '#5fb8e8', family: 'cool',    style: 'casual', trend: 5 },
+      { e: '🥿', name: 'Ballerina',       color: '#ffb6c1', family: 'warm',    style: 'chique', trend: 7 },
+    ],
+    acc: [
+      { e: '👜', name: 'Handtas',         color: '#cc6699', family: 'warm',    style: 'chique', trend: 8 },
+      { e: '🎒', name: 'Rugzak',          color: '#3b6fa0', family: 'cool',    style: 'casual', trend: 7 },
+      { e: '👒', name: 'Hoed',            color: '#f3eede', family: 'neutral', style: 'chique', trend: 8 },
+      { e: '🧢', name: 'Pet',             color: '#222',    family: 'neutral', style: 'street', trend: 7 },
+      { e: '🕶️', name: 'Zonnebril',      color: '#222',    family: 'neutral', style: 'street', trend: 9 },
+      { e: '⌚', name: 'Horloge',         color: '#c0c0c0', family: 'neutral', style: 'chique', trend: 7 },
+      { e: '💍', name: 'Ring',            color: '#ffd84a', family: 'bright',  style: 'chique', trend: 6 },
+      { e: '👑', name: 'Kroon',           color: '#ffd84a', family: 'bright',  style: 'chique', trend: 10 },
+    ],
+  };
+
+  const tabConfig = [
+    { key: 'top',    label: '👕 Top' },
+    { key: 'bottom', label: '👖 Broek' },
+    { key: 'shoes',  label: '👟 Schoenen' },
+    { key: 'acc',    label: '👜 Accessoire' },
+  ];
+
+  let activeTab = 'top';
+  const outfit = { top: null, bottom: null, shoes: null, acc: null };
+
+  const tabsEl = $('#fg-tabs');
+  const itemsEl = $('#fg-items');
+  const livePill = $('#fg-livePill');
+
+  function showScreen(id) {
+    root.querySelectorAll('.fg-screen').forEach(s => s.classList.remove('active'));
+    root.querySelector('#fg-' + id).classList.add('active');
+  }
+
+  function toast(msg) {
+    const t = $('#fg-toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._h);
+    t._h = setTimeout(() => t.classList.remove('show'), 1400);
+  }
+
+  function renderTabs() {
+    tabsEl.innerHTML = '';
+    tabConfig.forEach(t => {
+      const b = document.createElement('button');
+      b.className = 'fg-tab' + (t.key === activeTab ? ' active' : '');
+      b.textContent = t.label;
+      b.onclick = () => { activeTab = t.key; renderTabs(); renderItems(); };
+      tabsEl.appendChild(b);
+    });
+  }
+
+  function renderItems() {
+    itemsEl.innerHTML = '';
+    wardrobe[activeTab].forEach((it, idx) => {
+      const d = document.createElement('div');
+      d.className = 'item' + (outfit[activeTab] && outfit[activeTab].idx === idx ? ' selected' : '');
+      d.innerHTML = `<span>${it.e}</span><span class="swatch" style="background:${it.color}"></span>`;
+      d.title = it.name;
+      d.onclick = () => selectItem(activeTab, idx);
+      itemsEl.appendChild(d);
+    });
+  }
+
+  function selectItem(slot, idx) {
+    const it = wardrobe[slot][idx];
+    outfit[slot] = { ...it, idx };
+    const slotEl = root.querySelector(`.slot[data-slot="${slot}"]`);
+    slotEl.classList.remove('empty');
+    slotEl.classList.add('filled');
+    slotEl.textContent = it.e;
+    slotEl.style.color = it.color;
+    slotEl.style.animation = 'none';
+    void slotEl.offsetWidth;
+    slotEl.style.animation = '';
+    renderItems();
+    updateLiveScore();
+  }
+
+  function resetOutfit() {
+    Object.keys(outfit).forEach(k => {
+      outfit[k] = null;
+      const s = root.querySelector(`.slot[data-slot="${k}"]`);
+      s.classList.add('empty');
+      s.classList.remove('filled');
+      s.style.color = '';
+      s.textContent = k === 'top' ? 'Top' : k === 'bottom' ? 'Broek' : k === 'shoes' ? 'Schoenen' : '+';
+    });
+    renderItems();
+    updateLiveScore();
+  }
+
+  function score(o) {
+    const parts = [o.top, o.bottom, o.shoes, o.acc].filter(Boolean);
+    if (parts.length === 0) return { total: 0, harmony: 0, style: 0, trend: 0, complete: 0 };
+
+    const families = parts.map(p => p.family);
+    const uniqueNonNeutral = new Set(families.filter(f => f !== 'neutral'));
+    let harmony;
+    if (uniqueNonNeutral.size <= 1) harmony = 25;
+    else if (uniqueNonNeutral.size === 2) harmony = 18;
+    else harmony = 8;
+
+    const styles = parts.map(p => p.style);
+    const uniqueStyles = new Set(styles);
+    let styleScore;
+    if (uniqueStyles.size === 1) styleScore = 25;
+    else if (uniqueStyles.size === 2) styleScore = 16;
+    else styleScore = 6;
+
+    const trendAvg = parts.reduce((s, p) => s + p.trend, 0) / parts.length;
+    const trendScore = Math.round(trendAvg * 2.5);
+    const complete = parts.length === 4 ? 25 : parts.length * 4;
+    const total = harmony + styleScore + trendScore + complete;
+    return { total, harmony, style: styleScore, trend: trendScore, complete };
+  }
+
+  function updateLiveScore() {
+    livePill.textContent = `Score: ${score(outfit).total}`;
+  }
+
+  function generateAiOutfit() {
+    const families = ['warm', 'cool', 'neutral', 'bright'];
+    const styles = ['casual', 'chique', 'sport', 'street'];
+    const tFam = families[Math.floor(Math.random() * families.length)];
+    const tSty = styles[Math.floor(Math.random() * styles.length)];
+
+    function pickFor(slot) {
+      const pool = wardrobe[slot];
+      const ranked = pool.map((it, idx) => {
+        let s = it.trend;
+        if (it.family === tFam || it.family === 'neutral') s += 5;
+        if (it.style === tSty) s += 4;
+        return { it, idx, s };
+      }).sort((a, b) => b.s - a.s);
+      const choice = ranked[Math.floor(Math.random() * Math.min(2, ranked.length))];
+      return { ...choice.it, idx: choice.idx };
+    }
+
+    return {
+      top: pickFor('top'),
+      bottom: pickFor('bottom'),
+      shoes: pickFor('shoes'),
+      acc: pickFor('acc'),
+    };
+  }
+
+  function judge() {
+    const filled = Object.values(outfit).filter(Boolean).length;
+    if (filled < 3) { toast('Kies minstens 3 onderdelen!'); return; }
+
+    const you = score(outfit);
+    const ai = generateAiOutfit();
+    const aiScore = score(ai);
+
+    $('#fg-stackYou').textContent = ['top','bottom','shoes','acc'].map(k => outfit[k]?.e || '·').join('');
+    $('#fg-ptsYou').textContent = you.total;
+    $('#fg-stackAi').textContent = [ai.top.e, ai.bottom.e, ai.shoes.e, ai.acc.e].join('');
+    $('#fg-ptsAi').textContent = aiScore.total;
+
+    $('#fg-cardYou').classList.toggle('winner', you.total >= aiScore.total);
+    $('#fg-cardAi').classList.toggle('winner', aiScore.total > you.total);
+
+    let emoji, text;
+    if (you.total > aiScore.total) { emoji = '🏆'; text = 'Jij wint! Stijlicoon!'; }
+    else if (you.total === aiScore.total) { emoji = '🤝'; text = 'Gelijkspel — sterke look!'; }
+    else { emoji = '💅'; text = 'Stylist wint deze ronde'; }
+    $('#fg-verdictEmoji').textContent = emoji;
+    $('#fg-verdictText').textContent = text;
+
+    $('#fg-breakdown').innerHTML = `
+      <h3>Jouw beoordeling</h3>
+      <div class="br-row"><span>🎨 Kleurharmonie</span><span>${you.harmony}/25</span></div>
+      <div class="br-row"><span>✨ Stijlcoherentie</span><span>${you.style}/25</span></div>
+      <div class="br-row"><span>🔥 Trendscore</span><span>${you.trend}/25</span></div>
+      <div class="br-row"><span>👗 Compleetheid</span><span>${you.complete}/25</span></div>
+      <div class="br-row" style="border-top:1px solid rgba(0,0,0,0.1); margin-top:6px; padding-top:8px;">
+        <span><b>Totaal</b></span><span><b>${you.total}/100</b></span>
+      </div>
+    `;
+    showScreen('result');
+  }
+
+  $('#fg-startBtn').onclick = () => showScreen('game');
+  $('#fg-resetBtn').onclick = resetOutfit;
+  $('#fg-judgeBtn').onclick = judge;
+  $('#fg-playAgainBtn').onclick = () => { resetOutfit(); showScreen('game'); };
+
+  renderTabs();
+  renderItems();
+})();
 </script>
 </body>
 </html>
