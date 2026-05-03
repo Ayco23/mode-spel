@@ -631,6 +631,7 @@
   let selectedGenre = genres[0];
   let voices = [];
   let isSinging = false;
+  let keepAliveTimer = null;
 
   // ---------- VOICES ----------
   function loadVoices() { voices = window.speechSynthesis.getVoices(); }
@@ -725,6 +726,135 @@
     return mode === 'exact' ? lyricsEl.value : generatedEl.value;
   }
 
+  // ---------- BACKING TRACK (Web Audio) ----------
+  const NOTES = { C:261.63,'C#':277.18,D:293.66,'D#':311.13,E:329.63,F:349.23,'F#':369.99,G:392.00,'G#':415.30,A:440.00,'A#':466.16,B:493.88 };
+
+  function parseChord(name) {
+    const m = name.match(/^([A-G]#?)(maj7|m7|dim|sus4|m|7)?$/);
+    if (!m) return [261.63, 329.63, 392.00];
+    const root = NOTES[m[1]] || 261.63;
+    const kind = m[2] || '';
+    const semis = [0];
+    if (kind === 'm' || kind === 'm7') semis.push(3);
+    else if (kind === 'dim') { semis.push(3); }
+    else if (kind === 'sus4') semis.push(5);
+    else semis.push(4);
+    if (kind === 'dim') semis.push(6);
+    else semis.push(7);
+    if (kind === '7' || kind === 'm7') semis.push(10);
+    else if (kind === 'maj7') semis.push(11);
+    return semis.map(s => root * Math.pow(2, s / 12));
+  }
+
+  // Per-genre backing track config: bpm, chord progression, oscillator timbre, drums.
+  const beats = {
+    pop:     { bpm: 96,  prog: ['C','G','Am','F'],         wave: 'triangle', drum: true,  bass: true,  vol: 0.07 },
+    rock:    { bpm: 116, prog: ['E','D','A','E'],          wave: 'sawtooth', drum: true,  bass: true,  vol: 0.06 },
+    opera:   { bpm: 60,  prog: ['C','F','G','C'],          wave: 'sine',     drum: false, bass: false, vol: 0.06 },
+    rap:     { bpm: 88,  prog: ['Am','Am','Dm','Am'],      wave: 'square',   drum: true,  bass: true,  vol: 0.05 },
+    ballad:  { bpm: 64,  prog: ['C','Am','F','G'],         wave: 'sine',     drum: false, bass: true,  vol: 0.06 },
+    techno:  { bpm: 124, prog: ['Am','Am','Am','Am'],      wave: 'square',   drum: true,  bass: true,  vol: 0.05 },
+    reggae:  { bpm: 76,  prog: ['C','F','G','F'],          wave: 'triangle', drum: true,  bass: true,  vol: 0.06, offbeat: true },
+    country: { bpm: 96,  prog: ['G','C','D','G'],          wave: 'triangle', drum: true,  bass: true,  vol: 0.06 },
+    jazz:    { bpm: 100, prog: ['Dm7','G7','Cmaj7','Cmaj7'], wave: 'sine',   drum: false, bass: true,  vol: 0.05 },
+    kinder:  { bpm: 108, prog: ['C','F','G','C'],          wave: 'triangle', drum: true,  bass: true,  vol: 0.06 },
+    blues:   { bpm: 60,  prog: ['E7','E7','A7','E7','B7','A7','E7','B7'], wave: 'sawtooth', drum: false, bass: true, vol: 0.06 },
+  };
+
+  // Per-genre singing chunk size. Smaller = more staccato; larger = more legato.
+  const groupSize = { rap: 1, techno: 1, blues: 3, ballad: 3, opera: 3, jazz: 3 };
+
+  let audioCtx = null;
+  let backingTimer = null;
+
+  function getCtx() {
+    if (!audioCtx) {
+      const C = window.AudioContext || window.webkitAudioContext;
+      if (C) audioCtx = new C();
+    }
+    return audioCtx;
+  }
+
+  function playChord(ctx, freqs, time, duration, wave, vol) {
+    freqs.forEach(f => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = wave;
+      osc.frequency.value = f;
+      osc.connect(gain); gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(0, time);
+      gain.gain.linearRampToValueAtTime(vol, time + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+      osc.start(time); osc.stop(time + duration + 0.05);
+    });
+  }
+
+  function playBass(ctx, freq, time, duration, vol) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq / 2;
+    osc.connect(gain); gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(vol * 1.4, time + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + duration);
+    osc.start(time); osc.stop(time + duration + 0.05);
+  }
+
+  function playKick(ctx, time, vol) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.setValueAtTime(120, time);
+    osc.frequency.exponentialRampToValueAtTime(45, time + 0.12);
+    gain.gain.setValueAtTime(vol * 1.8, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(time); osc.stop(time + 0.2);
+  }
+
+  function playHat(ctx, time, vol) {
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(vol, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+    src.connect(gain); gain.connect(ctx.destination);
+    src.start(time);
+  }
+
+  function startBacking(genreId) {
+    const cfg = beats[genreId] || beats.pop;
+    const ctx = getCtx();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const beatDur = 60 / cfg.bpm;
+    let step = 0;
+
+    const tick = () => {
+      const t = ctx.currentTime + 0.04;
+      const freqs = parseChord(cfg.prog[step % cfg.prog.length]);
+      if (cfg.offbeat) {
+        playChord(ctx, freqs, t + beatDur * 0.5, beatDur * 0.4, cfg.wave, cfg.vol);
+      } else {
+        playChord(ctx, freqs, t, beatDur * 0.85, cfg.wave, cfg.vol);
+      }
+      if (cfg.bass) playBass(ctx, freqs[0], t, beatDur * 0.45, cfg.vol);
+      if (cfg.drum) {
+        playKick(ctx, t, cfg.vol);
+        playHat(ctx, t + beatDur * 0.5, cfg.vol * 0.7);
+      }
+      step++;
+    };
+    tick();
+    backingTimer = setInterval(tick, beatDur * 1000);
+  }
+
+  function stopBacking() {
+    if (backingTimer) { clearInterval(backingTimer); backingTimer = null; }
+  }
+
   // ---------- SING ----------
   function syllabify(text) {
     const words = text.replace(/\n/g, ' ').trim().split(/\s+/);
@@ -764,6 +894,23 @@
     }
   }
 
+  // Group words into singing chunks. Honours line breaks and punctuation as natural pauses.
+  function groupIntoChunks(text, size) {
+    const lines = text.replace(/\n+/g, '\n').split('\n');
+    const chunks = [];
+    lines.forEach(line => {
+      const subs = line.split(/([,;])/).map(s => s.trim()).filter(Boolean);
+      subs.forEach(sub => {
+        if (sub === ',' || sub === ';') return;
+        const ws = sub.split(/\s+/);
+        for (let i = 0; i < ws.length; i += size) {
+          chunks.push(ws.slice(i, i + size).join(' '));
+        }
+      });
+    });
+    return chunks;
+  }
+
   function sing() {
     if (!('speechSynthesis' in window)) { toast('Spraak niet ondersteund 😔'); return; }
     const text = getActiveText().trim();
@@ -772,49 +919,84 @@
     speechSynthesis.cancel();
     if (!voices.length) loadVoices();
 
-    const syllables = syllabify(text);
-    if (!syllables.length) return;
-    renderLyric(syllables);
+    const allSyllables = syllabify(text);
+    if (!allSyllables.length) return;
+    renderLyric(allSyllables);
     barsEl.classList.add('on');
     isSinging = true;
+
+    // Kick off the backing track first so audio begins immediately.
+    startBacking(selectedGenre.id);
 
     const langCode = language === 'nl' ? 'nl-NL' : (selectedArtist.defaultLang.startsWith('en') ? selectedArtist.defaultLang : 'en-US');
     const voice = pickVoice(selectedArtist, langCode);
     const melody = selectedGenre.melody;
-    let i = 0;
+    const size = groupSize[selectedGenre.id] || 2;
+    const chunks = groupIntoChunks(text, size);
 
-    const speakNext = () => {
-      if (!isSinging || i >= syllables.length) {
-        isSinging = false;
-        barsEl.classList.remove('on');
-        document.querySelectorAll('.syl').forEach(el => el.classList.remove('on'));
-        return;
-      }
-      const s = syllables[i];
-      const u = new SpeechSynthesisUtterance(s.text);
+    // Map each chunk to its syllable index range so we can highlight along.
+    let cursor = 0;
+    const chunkInfo = chunks.map(c => {
+      const n = syllabify(c).length || 1;
+      const start = cursor;
+      cursor += n;
+      return { text: c, start, count: n };
+    });
+
+    // Queue all utterances upfront — Web Speech plays them back-to-back without the
+    // setTimeout gaps that made the old per-syllable version sound choppy.
+    chunkInfo.forEach((info, ci) => {
+      const u = new SpeechSynthesisUtterance(info.text);
       if (voice) u.voice = voice;
       u.lang = langCode;
-      const melodyMul = melody[i % melody.length];
+      const melodyMul = melody[ci % melody.length];
       u.pitch = Math.max(0.1, Math.min(2, selectedArtist.pitch * melodyMul));
       u.rate = Math.max(0.1, Math.min(3, selectedArtist.rate * selectedGenre.rateMul));
       u.volume = 1;
 
-      highlightSyllable(i);
-
-      u.onend = () => {
-        i++;
-        const pauseMs = s.isLast ? selectedGenre.pause * 2 : selectedGenre.pause;
-        setTimeout(speakNext, pauseMs);
+      u.onstart = () => {
+        if (!isSinging) return;
+        // Animate highlighting through this chunk's syllables.
+        const startTime = performance.now();
+        const estDur = Math.max(0.25, info.text.length / (12 * u.rate));
+        const animate = () => {
+          if (!isSinging) return;
+          const elapsed = (performance.now() - startTime) / 1000;
+          const progress = Math.min(1, elapsed / estDur);
+          const idx = Math.min(info.count - 1, Math.floor(progress * info.count));
+          highlightSyllable(info.start + idx);
+          if (progress < 1) requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate);
       };
-      u.onerror = () => { i++; setTimeout(speakNext, 50); };
+
+      if (ci === chunkInfo.length - 1) {
+        u.onend = () => {
+          isSinging = false;
+          stopBacking();
+          barsEl.classList.remove('on');
+          document.querySelectorAll('.syl').forEach(el => el.classList.remove('on'));
+        };
+      }
       speechSynthesis.speak(u);
-    };
-    speakNext();
+    });
+
+    // Chrome/Edge silently pause speech after ~15s. Pump pause/resume to keep it alive.
+    if (keepAliveTimer) clearInterval(keepAliveTimer);
+    keepAliveTimer = setInterval(() => {
+      if (!isSinging) { clearInterval(keepAliveTimer); keepAliveTimer = null; return; }
+      if (speechSynthesis.speaking) {
+        speechSynthesis.pause();
+        speechSynthesis.resume();
+      }
+    }, 9000);
   }
 
   function stop() {
     isSinging = false;
     if ('speechSynthesis' in window) speechSynthesis.cancel();
+    stopBacking();
+    if (keepAliveTimer) { clearInterval(keepAliveTimer); keepAliveTimer = null; }
     barsEl.classList.remove('on');
     document.querySelectorAll('.syl').forEach(el => el.classList.remove('on'));
   }
