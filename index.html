@@ -33,10 +33,11 @@
   }
   header {
     text-align: center;
-    padding: 14px 0 8px;
+    padding: 12px 0 6px;
+    position: relative;
   }
   header h1 {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 900;
     letter-spacing: 1px;
     background: linear-gradient(90deg, #ff4f8b, #ffd84a, #4fc3ff);
@@ -44,32 +45,59 @@
     background-clip: text;
     color: transparent;
   }
-  header p { font-size: 12px; opacity: 0.65; margin-top: 2px; }
+  header p { font-size: 11px; opacity: 0.6; margin-top: 2px; }
 
   main {
     flex: 1;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding: 4px 2px 80px;
+    gap: 12px;
+    padding: 4px 2px 90px;
   }
   main::-webkit-scrollbar { display: none; }
 
   section.card {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
-    padding: 12px 14px;
+    border-radius: 14px;
+    padding: 10px 12px;
     backdrop-filter: blur(10px);
   }
+  .row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
   .label {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 1.5px;
     opacity: 0.6;
     text-transform: uppercase;
-    margin-bottom: 8px;
+  }
+  .lang-toggle {
+    display: flex;
+    gap: 4px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 999px;
+    padding: 3px;
+  }
+  .lang-toggle button {
+    background: transparent;
+    border: none;
+    color: #f0e9ff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .lang-toggle button.active {
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    box-shadow: 0 2px 8px rgba(138, 79, 255, 0.4);
   }
 
   .h-scroll {
@@ -89,9 +117,9 @@
     background: rgba(255,255,255,0.08);
     border: 1.5px solid transparent;
     color: #f0e9ff;
-    border-radius: 14px;
-    padding: 10px 12px;
-    font-size: 13px;
+    border-radius: 12px;
+    padding: 9px 11px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -109,20 +137,45 @@
   .chip .emoji { font-size: 20px; }
   .chip .meta { font-size: 10px; opacity: 0.75; font-weight: 500; }
 
-  textarea {
+  .mode-tabs {
+    display: flex;
+    gap: 4px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    padding: 3px;
+    margin-bottom: 10px;
+  }
+  .mode-tabs button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #f0e9ff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .mode-tabs button.active {
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    box-shadow: 0 2px 8px rgba(138, 79, 255, 0.4);
+  }
+
+  textarea, input[type="text"] {
     width: 100%;
     background: rgba(0,0,0,0.3);
     border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
+    border-radius: 10px;
     color: #f0e9ff;
-    padding: 12px;
+    padding: 11px;
     font-size: 14px;
     font-family: inherit;
     resize: none;
-    min-height: 90px;
     line-height: 1.4;
   }
-  textarea:focus {
+  textarea { min-height: 90px; }
+  textarea:focus, input[type="text"]:focus {
     outline: none;
     border-color: #ff4f8b;
     box-shadow: 0 0 0 2px rgba(255,79,139,0.2);
@@ -130,7 +183,7 @@
 
   .row {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     margin-top: 8px;
     flex-wrap: wrap;
   }
@@ -139,41 +192,60 @@
     background: rgba(255,255,255,0.08);
     border: none;
     color: #f0e9ff;
-    padding: 8px 10px;
+    padding: 7px 10px;
     border-radius: 999px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
   }
   .preset:active { transform: scale(0.95); }
 
+  .gen-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #4fc3ff, #8a4fff);
+    color: white;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(79, 195, 255, 0.35);
+  }
+  .gen-btn:active { transform: scale(0.97); }
+
   .stage {
     background: linear-gradient(180deg, rgba(255,79,139,0.12), rgba(79,195,255,0.12));
-    border-radius: 18px;
-    padding: 18px 14px;
+    border-radius: 16px;
+    padding: 16px 12px;
     text-align: center;
     border: 1px solid rgba(255,255,255,0.08);
-    min-height: 130px;
+    min-height: 120px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     position: relative;
     overflow: hidden;
   }
   .stage .who {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     opacity: 0.85;
   }
-  .stage .who .small { font-size: 11px; opacity: 0.7; font-weight: 500; }
+  .stage .who .small { font-size: 10px; opacity: 0.7; font-weight: 500; }
   .lyric {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 800;
-    line-height: 1.3;
-    min-height: 24px;
+    line-height: 1.35;
+    min-height: 22px;
+    max-height: 80px;
+    overflow-y: auto;
+    scrollbar-width: none;
   }
+  .lyric::-webkit-scrollbar { display: none; }
   .lyric .syl {
     display: inline-block;
     transition: transform 0.15s ease, color 0.15s ease;
@@ -181,7 +253,7 @@
   }
   .lyric .syl.on {
     color: #ffd84a;
-    transform: translateY(-6px) scale(1.15);
+    transform: translateY(-5px) scale(1.15);
     text-shadow: 0 4px 14px rgba(255,216,74,0.6);
   }
 
@@ -189,7 +261,7 @@
     display: flex;
     align-items: flex-end;
     gap: 3px;
-    height: 30px;
+    height: 26px;
   }
   .bar {
     width: 4px;
@@ -203,7 +275,7 @@
   .bars.on .bar:nth-child(3) { animation-delay: 0.2s; }
   .bars.on .bar:nth-child(4) { animation-delay: 0.05s; }
   .bars.on .bar:nth-child(5) { animation-delay: 0.15s; }
-  @keyframes dance { to { height: 28px; } }
+  @keyframes dance { to { height: 24px; } }
 
   footer {
     position: fixed;
@@ -224,7 +296,7 @@
   .btn {
     border: none;
     color: white;
-    padding: 14px 18px;
+    padding: 13px 18px;
     font-size: 15px;
     font-weight: 800;
     border-radius: 999px;
@@ -234,14 +306,12 @@
     transition: transform 0.12s ease;
   }
   .btn:active { transform: scale(0.96); }
-  .btn.sing {
-    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
-  }
+  .btn.sing { background: linear-gradient(90deg, #ff4f8b, #8a4fff); }
   .btn.stop {
     background: rgba(255,255,255,0.1);
     color: #f0e9ff;
     box-shadow: none;
-    flex: 0 0 80px;
+    flex: 0 0 70px;
     border: 1px solid rgba(255,255,255,0.15);
   }
   .toast {
@@ -257,18 +327,31 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
+    text-align: center;
   }
   .toast.show { opacity: 1; }
+
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 <div id="app">
   <header>
     <h1>🎤 ZING-O-MATIC</h1>
-    <p>Kies een artiest, een tekst en een genre</p>
+    <p>Kies artiest, taal, genre & tekst</p>
   </header>
 
   <main>
+    <section class="card">
+      <div class="row-head">
+        <span class="label">Taal</span>
+        <div class="lang-toggle" id="langToggle">
+          <button data-lang="nl" class="active">🇳🇱 Nederlands</button>
+          <button data-lang="en">🇬🇧 English</button>
+        </div>
+      </div>
+    </section>
+
     <section class="card">
       <div class="label">1. Artiest</div>
       <div class="h-scroll" id="artists"></div>
@@ -281,12 +364,20 @@
 
     <section class="card">
       <div class="label">3. Tekst</div>
-      <textarea id="lyrics" placeholder="Schrijf hier de songtekst die de artiest moet zingen..." maxlength="400">De zon schijnt door het raam, ik zing een lied voor jou</textarea>
-      <div class="row">
-        <button class="preset" data-text="De zon schijnt door het raam, ik zing een lied voor jou">☀️ Zonnig</button>
-        <button class="preset" data-text="Tranen vallen in de regen, mijn hart is leeg vannacht">💔 Verdriet</button>
-        <button class="preset" data-text="Yo, check the rhythm, ik ben de beste in de game">🎧 Stoer</button>
-        <button class="preset" data-text="Dansen tot de zon opkomt, vannacht is van ons">🪩 Feest</button>
+      <div class="mode-tabs" id="modeTabs">
+        <button data-mode="exact" class="active">📝 Exacte tekst</button>
+        <button data-mode="prompt">✨ Genereer uit prompt</button>
+      </div>
+
+      <div id="exactPanel">
+        <textarea id="lyrics" placeholder="Schrijf hier de exacte songtekst..." maxlength="500">De zon schijnt door het raam, ik zing een lied voor jou</textarea>
+        <div class="row" id="presetRow"></div>
+      </div>
+
+      <div id="promptPanel" class="hidden">
+        <input type="text" id="prompt" placeholder="bijv. een liefdesliedje over de zomer" maxlength="120" />
+        <button class="gen-btn" id="genBtn">✨ Genereer lyrics</button>
+        <textarea id="generatedLyrics" placeholder="Gegenereerde tekst verschijnt hier — je mag aanpassen" maxlength="500"></textarea>
       </div>
     </section>
 
@@ -312,23 +403,58 @@
 
 <script>
   // ---------- ARTISTS ----------
-  // gender: used for voice selection. pitch is base pitch offset, rate is base rate.
+  // Voice hints are ranked by preference. They're matched against the available voice
+  // names on the device, restricted to the currently selected language.
+  // pitch: base pitch multiplier (the artist's voice character).
+  // rate:  base speech rate (slower = soulful, faster = rap).
   const artists = [
-    { id: 'adele',    name: 'Adele',         emoji: '🎙️', gender: 'female', pitch: 0.85, rate: 0.85, lang: 'en-GB', meta: 'Soulful' },
-    { id: 'beyonce',  name: 'Beyoncé',       emoji: '👑', gender: 'female', pitch: 1.15, rate: 1.0,  lang: 'en-US', meta: 'Diva power' },
-    { id: 'taylor',   name: 'Taylor Swift',  emoji: '✨', gender: 'female', pitch: 1.05, rate: 1.05, lang: 'en-US', meta: 'Pop sweet' },
-    { id: 'sheeran',  name: 'Ed Sheeran',    emoji: '🎸', gender: 'male',   pitch: 1.0,  rate: 1.0,  lang: 'en-GB', meta: 'Akoestisch' },
-    { id: 'drake',    name: 'Drake',         emoji: '🦉', gender: 'male',   pitch: 0.75, rate: 0.95, lang: 'en-US', meta: 'Smooth flow' },
-    { id: 'eminem',   name: 'Eminem',        emoji: '🔥', gender: 'male',   pitch: 0.9,  rate: 1.4,  lang: 'en-US', meta: 'Snel & scherp' },
-    { id: 'hazes',    name: 'André Hazes',   emoji: '🍻', gender: 'male',   pitch: 0.7,  rate: 0.85, lang: 'nl-NL', meta: 'Levenslied' },
-    { id: 'borsato',  name: 'Marco Borsato', emoji: '❤️', gender: 'male',   pitch: 0.85, rate: 0.9,  lang: 'nl-NL', meta: 'Smartlap' },
-    { id: 'aguilera', name: 'Christina A.',  emoji: '💖', gender: 'female', pitch: 1.3,  rate: 0.95, lang: 'en-US', meta: 'Hoge noten' },
-    { id: 'cash',     name: 'Johnny Cash',   emoji: '🤠', gender: 'male',   pitch: 0.55, rate: 0.8,  lang: 'en-US', meta: 'Diepe stem' },
+    { id: 'springsteen', name: 'Bruce Springsteen', emoji: '🎸', gender: 'male',
+      pitch: 0.65, rate: 0.88, defaultLang: 'en-US',
+      hints: ['aaron', 'arthur', 'fred', 'rocko', 'reed', 'ralph', 'eddy'],
+      meta: 'The Boss' },
+    { id: 'cash',     name: 'Johnny Cash',   emoji: '🤠', gender: 'male',
+      pitch: 0.5, rate: 0.78, defaultLang: 'en-US',
+      hints: ['fred', 'aaron', 'arthur', 'ralph', 'rocko'],
+      meta: 'Diepe stem' },
+    { id: 'drake',    name: 'Drake',         emoji: '🦉', gender: 'male',
+      pitch: 0.78, rate: 0.95, defaultLang: 'en-US',
+      hints: ['alex', 'aaron', 'tom', 'evan'],
+      meta: 'Smooth flow' },
+    { id: 'sheeran',  name: 'Ed Sheeran',    emoji: '🎸', gender: 'male',
+      pitch: 1.05, rate: 1.0, defaultLang: 'en-GB',
+      hints: ['daniel', 'oliver', 'arthur', 'martin'],
+      meta: 'Akoestisch' },
+    { id: 'eminem',   name: 'Eminem',        emoji: '🔥', gender: 'male',
+      pitch: 0.95, rate: 1.45, defaultLang: 'en-US',
+      hints: ['alex', 'aaron', 'evan', 'tom'],
+      meta: 'Snel & scherp' },
+    { id: 'adele',    name: 'Adele',         emoji: '🎙️', gender: 'female',
+      pitch: 0.9, rate: 0.82, defaultLang: 'en-GB',
+      hints: ['kate', 'serena', 'fiona', 'moira', 'tessa', 'martha'],
+      meta: 'Soulful UK' },
+    { id: 'beyonce',  name: 'Beyoncé',       emoji: '👑', gender: 'female',
+      pitch: 1.2, rate: 1.0, defaultLang: 'en-US',
+      hints: ['samantha', 'ava', 'allison', 'susan', 'nicky'],
+      meta: 'Diva power' },
+    { id: 'taylor',   name: 'Taylor Swift',  emoji: '✨', gender: 'female',
+      pitch: 1.1, rate: 1.05, defaultLang: 'en-US',
+      hints: ['ava', 'samantha', 'allison', 'susan', 'karen'],
+      meta: 'Pop sweet' },
+    { id: 'aguilera', name: 'Christina A.',  emoji: '💖', gender: 'female',
+      pitch: 1.4, rate: 0.95, defaultLang: 'en-US',
+      hints: ['samantha', 'ava', 'susan', 'allison'],
+      meta: 'Hoge noten' },
+    { id: 'hazes',    name: 'André Hazes',   emoji: '🍻', gender: 'male',
+      pitch: 0.62, rate: 0.85, defaultLang: 'nl-NL',
+      hints: ['xander', 'nederlands', 'dutch'],
+      meta: 'Levenslied' },
+    { id: 'borsato',  name: 'Marco Borsato', emoji: '❤️', gender: 'male',
+      pitch: 0.85, rate: 0.92, defaultLang: 'nl-NL',
+      hints: ['xander', 'nederlands', 'dutch'],
+      meta: 'Smartlap' },
   ];
 
   // ---------- GENRES ----------
-  // melody: array of pitch multipliers cycled per syllable.
-  // rateMul: multiplier on artist rate. pause: ms between syllables.
   const genres = [
     { id: 'pop',     name: 'Pop',     emoji: '🎵', melody: [1.0, 1.1, 1.05, 1.15, 1.0, 0.95], rateMul: 1.0,  pause: 90,  meta: 'Vrolijk' },
     { id: 'rock',    name: 'Rock',    emoji: '🎸', melody: [0.9, 1.0, 0.85, 0.95, 1.1, 0.9],  rateMul: 1.05, pause: 70,  meta: 'Stevig' },
@@ -342,31 +468,178 @@
     { id: 'kinder',  name: 'Kinder',  emoji: '🧸', melody: [1.2, 1.3, 1.4, 1.3, 1.2, 1.35],   rateMul: 1.1,  pause: 100, meta: 'Vrolijk hoog' },
   ];
 
+  // ---------- LYRICS GENERATOR ----------
+  // Curated rhyming verses per theme/language. Two random verses are joined into 4 lines.
+  const verses = {
+    nl: {
+      liefde: [
+        ['Jij bent mijn zon op een grijze dag', 'Voor jou doe ik alles wat ik mag'],
+        ['Onze harten kloppen samen in tijd', 'Ik weet dat dit voor altijd blijft'],
+        ['In jouw ogen vind ik mijn thuis', 'Met jou voelt elke storm als bries'],
+        ['Een kus van jou en de wereld staat stil', 'Ik volg jou waar je ook gaan wil'],
+        ['Door dik en dun, jij bent van mij', 'Geen één is zo bijzonder als jij'],
+      ],
+      zomer: [
+        ['De zon schijnt fel op het strand', 'Ik dans met jou hand in hand'],
+        ['Zomerdagen, eindeloos blauw', 'Niemand anders dan ik en jou'],
+        ['IJsjes smelten in de hete wind', 'Vakantie waar het feest begint'],
+        ['Blote voeten in het warme zand', 'De zomer zingt door heel het land'],
+        ['Pakken pijp aan stille zee', 'Ik neem deze zomer met me mee'],
+      ],
+      verdriet: [
+        ['Tranen vallen in de regen', 'Zonder jou ben ik bezweken'],
+        ['Lege kamers, koude muren', 'Ik tel de minuten en de uren'],
+        ['Mijn hart ligt in duizend stukken', 'Niets dat dit nog kan ontrukken'],
+        ['De stilte schreeuwt jouw naam terug', 'Kom alsjeblieft toch nog terug'],
+        ['Donkere nachten zonder licht', 'Ik mis jouw stem, jouw lach, jouw gezicht'],
+      ],
+      feest: [
+        ['Dansen tot de zon opkomt', 'Vannacht voelt zo verdomd goed'],
+        ['Beats die door mijn aderen gaan', 'Niemand kan ons hier nog verslaan'],
+        ['Hef je glas, de nacht is jong', 'Zing mee met dit gezang'],
+        ['Lichten flitsen op de vloer', 'Wij dansen tot de morgen door'],
+        ['Iedereen staat op zijn kop', 'Dit feest stopt hier echt nog niet op'],
+      ],
+      vrijheid: [
+        ['De weg ligt open, lang en breed', 'Ik laat alles wat zwaar is gereed'],
+        ['Wind in mijn haren, vrij en wild', 'Geen muren die mij nog stilt'],
+        ['Vleugels uitslaan naar de lucht', 'Niemand die mijn vlam nog blust'],
+        ['Achterom kijken doe ik niet meer', 'Voorwaarts, telkens telkens weer'],
+        ['Ik loop mijn eigen pad alleen', 'Vrijheid stroomt door elk been'],
+      ],
+      nacht: [
+        ['Sterren fluisteren een lied', 'Iemand die me vannacht ziet'],
+        ['De maan kleurt zilver op de straat', 'Het uur waarop niemand bestaat'],
+        ['Donkere uren, stille tijd', 'Mijn gedachten zijn wijd en breed'],
+        ['Lantarens dansen op het plein', 'In de nacht voel ik mij vrij'],
+        ['Onder een hemel vol met licht', 'Sluit ik langzaam mijn gezicht'],
+      ],
+    },
+    en: {
+      liefde: [
+        ['You are my sunshine on a cloudy day', 'For you I would do anything you say'],
+        ['Our hearts beat as one through the night', 'With you everything just feels right'],
+        ['In your eyes I find my home', 'With you I never feel alone'],
+        ['One kiss from you and time stands still', 'I follow you wherever you will'],
+        ['Through thick and thin you are mine', 'No one else makes my soul shine'],
+      ],
+      zomer: [
+        ['Sun is shining on the sand', 'Dancing with you, hand in hand'],
+        ['Summer days, an endless blue', 'No one else but me and you'],
+        ['Ice cream melts in the burning heat', 'This summer love is bittersweet'],
+        ['Bare feet on the warm shoreline', 'Every moment feels like wine'],
+        ['Salty waves and golden hair', 'Summer love, beyond compare'],
+      ],
+      verdriet: [
+        ['Tears are falling in the rain', 'Without you all I feel is pain'],
+        ['Empty rooms and silent walls', 'I count the minutes as time crawls'],
+        ['My heart lies in a thousand parts', 'Broken open, missing arts'],
+        ['The silence screams your name out loud', 'Come back to me, break through the cloud'],
+        ['Dark nights without a light', 'I miss your voice, your touch, your sight'],
+      ],
+      feest: [
+        ['Dancing till the sun comes up', 'Tonight we fill the highest cup'],
+        ['Beats are running through my veins', 'No one breaks these golden chains'],
+        ['Raise your glass the night is young', 'Sing along this party song'],
+        ['Lights are flashing on the floor', 'We will dance forevermore'],
+        ['Everybody loses control', 'This party feeds my hungry soul'],
+      ],
+      vrijheid: [
+        ['The road stretches wide and free', 'I leave behind what used to be'],
+        ['Wind is rushing through my hair', 'No more walls, no more despair'],
+        ['Spreading wings into the sky', 'Nothing left to wonder why'],
+        ['I will never look behind', 'Forward, leaving chains behind'],
+        ['Walking my own path alone', 'Freedom calls me to the unknown'],
+      ],
+      nacht: [
+        ['Stars are whispering a song', 'In the night where I belong'],
+        ['Moon is silver on the street', 'Hour where the lonely meet'],
+        ['Darkened hours, silent time', 'Every thought feels like a rhyme'],
+        ['Streetlights dancing on the square', 'In the night I have no care'],
+        ['Under skies of velvet light', 'I drift slowly into night'],
+      ],
+    },
+  };
+
+  function detectTheme(prompt) {
+    const p = prompt.toLowerCase();
+    const map = [
+      ['liefde', /liefde|hart|kus|romant|verliefd|samen|love|heart|kiss|romant/],
+      ['zomer',  /zomer|zon|strand|vakantie|warm|summer|sun|beach|holiday/],
+      ['verdriet', /verdriet|traan|tranen|verloren|gemist|alleen|sad|cry|tears|miss|lonely|broken/],
+      ['feest',  /feest|dans|party|club|nacht uit|dance|celebrate/],
+      ['vrijheid', /vrij|reis|weg|free|road|adventure|escape/],
+      ['nacht',  /nacht|maan|donker|sterren|night|moon|dark|stars/],
+    ];
+    for (const [theme, re] of map) {
+      if (re.test(p)) return theme;
+    }
+    return null;
+  }
+
+  function generateLyrics(prompt, lang) {
+    const themes = Object.keys(verses[lang]);
+    const theme = detectTheme(prompt) || themes[Math.floor(Math.random() * themes.length)];
+    const pool = verses[lang][theme];
+    const a = pool[Math.floor(Math.random() * pool.length)];
+    let b;
+    do { b = pool[Math.floor(Math.random() * pool.length)]; } while (b === a && pool.length > 1);
+    return [...a, ...b].join('\n');
+  }
+
+  // ---------- PRESETS ----------
+  const presets = {
+    nl: [
+      { label: '☀️ Zonnig', text: 'De zon schijnt door het raam, ik zing een lied voor jou' },
+      { label: '💔 Verdriet', text: 'Tranen vallen in de regen, mijn hart is leeg vannacht' },
+      { label: '🎧 Stoer',   text: 'Yo, check de beat, ik ben de baas in de game' },
+      { label: '🪩 Feest',   text: 'Dansen tot de zon opkomt, vannacht is van ons' },
+    ],
+    en: [
+      { label: '☀️ Sunny',   text: 'The sun is shining through my window, singing a song for you' },
+      { label: '💔 Sad',     text: 'Tears are falling in the rain, my heart is empty tonight' },
+      { label: '🎧 Tough',   text: 'Yo, check the beat, I am the boss of this game' },
+      { label: '🪩 Party',   text: 'Dancing till the sun comes up, tonight belongs to us' },
+    ],
+  };
+
   // ---------- STATE ----------
+  let language = 'nl';
+  let mode = 'exact';
   let selectedArtist = artists[0];
   let selectedGenre = genres[0];
   let voices = [];
   let isSinging = false;
 
   // ---------- VOICES ----------
-  function loadVoices() {
-    voices = window.speechSynthesis.getVoices();
-  }
+  function loadVoices() { voices = window.speechSynthesis.getVoices(); }
   if (typeof speechSynthesis !== 'undefined') {
     loadVoices();
     speechSynthesis.onvoiceschanged = loadVoices;
   }
 
-  function pickVoice(artist) {
+  function pickVoice(artist, langCode) {
     if (!voices.length) return null;
-    // Prefer matching language + gender hint in name.
-    const langMatches = voices.filter(v => v.lang.startsWith(artist.lang.split('-')[0]));
+    const langPrefix = langCode.split('-')[0];
+    const sameLang = voices.filter(v => v.lang.startsWith(langPrefix));
+    const exactLang = voices.filter(v => v.lang === langCode);
+    const pool = exactLang.length ? exactLang : (sameLang.length ? sameLang : voices);
+
+    // 1) Try artist-specific name hints in the chosen language pool.
+    for (const hint of artist.hints) {
+      const m = pool.find(v => v.name.toLowerCase().includes(hint));
+      if (m) return m;
+    }
+    // 2) Fall back to a gender-matching voice.
     const genderHints = artist.gender === 'female'
-      ? ['female', 'woman', 'samantha', 'victoria', 'karen', 'tessa', 'fiona', 'moira', 'ellen', 'xander']
-      : ['male', 'man', 'daniel', 'alex', 'fred', 'oliver', 'thomas', 'rishi'];
-    const pool = langMatches.length ? langMatches : voices;
-    const matched = pool.find(v => genderHints.some(h => v.name.toLowerCase().includes(h)));
-    return matched || pool[0] || voices[0];
+      ? ['female', 'samantha', 'ava', 'allison', 'susan', 'karen', 'kate', 'serena',
+         'fiona', 'moira', 'tessa', 'victoria', 'martha', 'nicky', 'claire', 'ellen']
+      : ['male', 'daniel', 'alex', 'fred', 'aaron', 'arthur', 'oliver', 'thomas',
+         'rocko', 'ralph', 'reed', 'evan', 'tom', 'martin', 'xander'];
+    const g = pool.find(v => genderHints.some(h => v.name.toLowerCase().includes(h)));
+    if (g) return g;
+    // 3) Anything in the right language.
+    return pool[0] || voices[0];
   }
 
   // ---------- DOM ----------
@@ -374,9 +647,12 @@
   const artistsEl = $('#artists');
   const genresEl = $('#genres');
   const lyricsEl = $('#lyrics');
+  const generatedEl = $('#generatedLyrics');
+  const promptEl = $('#prompt');
   const whoEl = $('#who');
   const lyricEl = $('#lyric');
   const barsEl = $('#bars');
+  const presetRow = $('#presetRow');
 
   function renderArtists() {
     artistsEl.innerHTML = '';
@@ -400,8 +676,20 @@
     });
   }
 
+  function renderPresets() {
+    presetRow.innerHTML = '';
+    presets[language].forEach(p => {
+      const b = document.createElement('button');
+      b.className = 'preset';
+      b.textContent = p.label;
+      b.onclick = () => { lyricsEl.value = p.text; };
+      presetRow.appendChild(b);
+    });
+  }
+
   function updateWho() {
-    whoEl.innerHTML = `${selectedArtist.emoji} <b>${selectedArtist.name}</b> <span class="small">zingt in</span> ${selectedGenre.emoji} <b>${selectedGenre.name}</b>`;
+    const langLabel = language === 'nl' ? 'in 🇳🇱 NL' : 'in 🇬🇧 EN';
+    whoEl.innerHTML = `${selectedArtist.emoji} <b>${selectedArtist.name}</b> <span class="small">zingt ${langLabel} —</span> ${selectedGenre.emoji} <b>${selectedGenre.name}</b>`;
   }
 
   function toast(m) {
@@ -409,13 +697,16 @@
     t.textContent = m;
     t.classList.add('show');
     clearTimeout(t._h);
-    t._h = setTimeout(() => t.classList.remove('show'), 1500);
+    t._h = setTimeout(() => t.classList.remove('show'), 1700);
+  }
+
+  function getActiveText() {
+    return mode === 'exact' ? lyricsEl.value : generatedEl.value;
   }
 
   // ---------- SING ----------
   function syllabify(text) {
-    // Word-level syllabification: split each word on vowel groups.
-    const words = text.trim().split(/\s+/);
+    const words = text.replace(/\n/g, ' ').trim().split(/\s+/);
     const result = [];
     words.forEach((w, wi) => {
       const parts = w.match(/[^aeiouyAEIOUY]*[aeiouyAEIOUY]+(?:[^aeiouyAEIOUY]*$|[^aeiouyAEIOUY](?=[^aeiouyAEIOUY]))?/g);
@@ -446,16 +737,16 @@
   function highlightSyllable(idx) {
     document.querySelectorAll('.syl').forEach(el => el.classList.remove('on'));
     const el = document.querySelector(`.syl[data-idx="${idx}"]`);
-    if (el) el.classList.add('on');
+    if (el) {
+      el.classList.add('on');
+      el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }
   }
 
   function sing() {
-    if (!('speechSynthesis' in window)) {
-      toast('Spraak niet ondersteund 😔');
-      return;
-    }
-    const text = lyricsEl.value.trim();
-    if (!text) { toast('Schrijf eerst een tekst!'); return; }
+    if (!('speechSynthesis' in window)) { toast('Spraak niet ondersteund 😔'); return; }
+    const text = getActiveText().trim();
+    if (!text) { toast('Schrijf of genereer eerst een tekst!'); return; }
 
     speechSynthesis.cancel();
     if (!voices.length) loadVoices();
@@ -466,7 +757,8 @@
     barsEl.classList.add('on');
     isSinging = true;
 
-    const voice = pickVoice(selectedArtist);
+    const langCode = language === 'nl' ? 'nl-NL' : (selectedArtist.defaultLang.startsWith('en') ? selectedArtist.defaultLang : 'en-US');
+    const voice = pickVoice(selectedArtist, langCode);
     const melody = selectedGenre.melody;
     let i = 0;
 
@@ -480,7 +772,7 @@
       const s = syllables[i];
       const u = new SpeechSynthesisUtterance(s.text);
       if (voice) u.voice = voice;
-      u.lang = selectedArtist.lang;
+      u.lang = langCode;
       const melodyMul = melody[i % melody.length];
       u.pitch = Math.max(0.1, Math.min(2, selectedArtist.pitch * melodyMul));
       u.rate = Math.max(0.1, Math.min(3, selectedArtist.rate * selectedGenre.rateMul));
@@ -493,10 +785,7 @@
         const pauseMs = s.isLast ? selectedGenre.pause * 2 : selectedGenre.pause;
         setTimeout(speakNext, pauseMs);
       };
-      u.onerror = () => {
-        i++;
-        setTimeout(speakNext, 50);
-      };
+      u.onerror = () => { i++; setTimeout(speakNext, 50); };
       speechSynthesis.speak(u);
     };
     speakNext();
@@ -513,13 +802,35 @@
   $('#singBtn').onclick = sing;
   $('#stopBtn').onclick = stop;
 
-  document.querySelectorAll('.preset').forEach(p => {
-    p.onclick = () => { lyricsEl.value = p.dataset.text; };
+  document.querySelectorAll('#langToggle button').forEach(b => {
+    b.onclick = () => {
+      language = b.dataset.lang;
+      document.querySelectorAll('#langToggle button').forEach(x => x.classList.toggle('active', x === b));
+      renderPresets();
+      updateWho();
+    };
   });
+
+  document.querySelectorAll('#modeTabs button').forEach(b => {
+    b.onclick = () => {
+      mode = b.dataset.mode;
+      document.querySelectorAll('#modeTabs button').forEach(x => x.classList.toggle('active', x === b));
+      $('#exactPanel').classList.toggle('hidden', mode !== 'exact');
+      $('#promptPanel').classList.toggle('hidden', mode !== 'prompt');
+    };
+  });
+
+  $('#genBtn').onclick = () => {
+    const p = promptEl.value.trim();
+    if (!p) { toast('Geef eerst een prompt op!'); return; }
+    generatedEl.value = generateLyrics(p, language);
+    toast('🎵 Lyrics gegenereerd!');
+  };
 
   // ---------- INIT ----------
   renderArtists();
   renderGenres();
+  renderPresets();
   updateWho();
 </script>
 </body>
