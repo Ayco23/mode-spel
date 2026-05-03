@@ -3,672 +3,524 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<meta name="theme-color" content="#ff4f8b" />
-<title>Mode Spel</title>
+<meta name="theme-color" content="#8a4fff" />
+<title>Zing-o-Matic</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body {
     height: 100%;
-    overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: linear-gradient(160deg, #ffd1e1 0%, #c8b6ff 50%, #b8e1ff 100%);
-    color: #2a1a3a;
+    background: #0d0820;
+    color: #f0e9ff;
     user-select: none;
     -webkit-user-select: none;
+    overflow: hidden;
+  }
+  body {
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,79,139,0.35), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(79,195,255,0.30), transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(138,79,255,0.25), transparent 60%),
+      #0d0820;
   }
   #app {
     height: 100dvh;
-    display: flex;
-    flex-direction: column;
     max-width: 480px;
     margin: 0 auto;
-    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
+    display: flex;
+    flex-direction: column;
+    padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
   }
   header {
     text-align: center;
-    padding: 14px 12px 6px;
+    padding: 14px 0 8px;
   }
   header h1 {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #ff4f8b, #ffd84a, #4fc3ff);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
-  header p { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+  header p { font-size: 12px; opacity: 0.65; margin-top: 2px; }
 
-  .screen { flex: 1; display: none; flex-direction: column; min-height: 0; }
-  .screen.active { display: flex; }
-
-  /* HOME */
-  .home-inner {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 24px;
-    gap: 18px;
-  }
-  .logo {
-    font-size: 72px;
-    filter: drop-shadow(0 8px 14px rgba(255, 79, 139, 0.4));
-    animation: float 3s ease-in-out infinite;
-  }
-  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-  .home-inner h2 {
-    font-size: 28px;
-    font-weight: 900;
-    line-height: 1.1;
-  }
-  .home-inner p {
-    font-size: 14px;
-    opacity: 0.75;
-    max-width: 300px;
-    line-height: 1.5;
-  }
-  .btn {
-    border: none;
-    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
-    color: white;
-    padding: 14px 28px;
-    font-size: 16px;
-    font-weight: 700;
-    border-radius: 999px;
-    box-shadow: 0 8px 22px rgba(138, 79, 255, 0.4);
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-  }
-  .btn:active { transform: scale(0.96); box-shadow: 0 4px 12px rgba(138, 79, 255, 0.4); }
-  .btn.secondary {
-    background: rgba(255,255,255,0.7);
-    color: #2a1a3a;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-  }
-
-  /* GAME */
-  .mannequin-wrap {
-    position: relative;
-    flex: 1 1 38%;
-    min-height: 220px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 12px;
-  }
-  .mannequin {
-    position: relative;
-    width: 150px;
-    height: 100%;
-    max-height: 320px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .head {
-    width: 60px; height: 60px;
-    border-radius: 50%;
-    background: linear-gradient(160deg, #ffd6b8, #f5b890);
-    box-shadow: inset -6px -6px 12px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.1);
-    margin-bottom: -8px;
-    position: relative;
-    z-index: 1;
-  }
-  .head::before, .head::after {
-    content: '';
-    position: absolute;
-    top: 24px;
-    width: 5px; height: 5px;
-    background: #2a1a3a;
-    border-radius: 50%;
-  }
-  .head::before { left: 18px; }
-  .head::after { right: 18px; }
-  .smile {
-    position: absolute;
-    bottom: 16px; left: 50%;
-    transform: translateX(-50%);
-    width: 18px; height: 8px;
-    border-bottom: 2px solid #2a1a3a;
-    border-radius: 0 0 9px 9px;
-  }
-  .body-zone {
-    width: 110px;
-    aspect-ratio: 1 / 2.2;
-    position: relative;
-    background: rgba(255,255,255,0.35);
-    border-radius: 18px;
-    backdrop-filter: blur(6px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-  }
-  .slot {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-    transition: transform 0.25s ease;
-  }
-  .slot.empty {
-    font-size: 11px;
-    color: rgba(42,26,58,0.4);
-    border: 2px dashed rgba(42,26,58,0.25);
-    border-radius: 12px;
-    width: 70%;
-    text-align: center;
-  }
-  .slot.filled { animation: pop 0.35s ease; }
-  @keyframes pop { 0% { transform: translateX(-50%) scale(0.4); } 60% { transform: translateX(-50%) scale(1.15); } 100% { transform: translateX(-50%) scale(1); } }
-
-  .slot-top    { top: 6%;  height: 38%; width: 80%; }
-  .slot-bottom { top: 46%; height: 36%; width: 76%; }
-  .slot-shoes  { top: 84%; height: 14%; width: 60%; font-size: 26px; }
-  .slot-acc    { top: -10%; right: -18px; left: auto; transform: none; height: 36px; width: 36px; font-size: 22px; }
-  .slot-acc.empty { font-size: 10px; }
-
-  .score-pill {
-    position: absolute;
-    top: 8px; left: 8px;
-    background: rgba(255,255,255,0.85);
-    padding: 6px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
-    color: #8a4fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  }
-
-  /* PICKER */
-  .picker {
-    flex: 1 1 62%;
-    background: rgba(255,255,255,0.6);
-    backdrop-filter: blur(10px);
-    border-radius: 24px 24px 0 0;
-    padding: 12px 12px 8px;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    box-shadow: 0 -6px 22px rgba(0,0,0,0.08);
-  }
-  .tabs {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 10px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .tabs::-webkit-scrollbar { display: none; }
-  .tab {
-    flex: 1 0 auto;
-    padding: 8px 12px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.7);
-    font-size: 13px;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    color: #2a1a3a;
-    white-space: nowrap;
-    transition: all 0.15s ease;
-  }
-  .tab.active {
-    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
-    color: white;
-    box-shadow: 0 4px 10px rgba(138, 79, 255, 0.35);
-  }
-  .items {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    overflow-y: auto;
-    padding: 4px 2px 8px;
-    align-content: start;
-  }
-  .item {
-    aspect-ratio: 1;
-    background: white;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    cursor: pointer;
-    border: 2px solid transparent;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    position: relative;
-    transition: transform 0.12s ease, border-color 0.12s ease;
-  }
-  .item:active { transform: scale(0.92); }
-  .item.selected {
-    border-color: #ff4f8b;
-    box-shadow: 0 0 0 3px rgba(255,79,139,0.2), 0 4px 10px rgba(255,79,139,0.25);
-  }
-  .item .swatch {
-    position: absolute;
-    bottom: 4px; right: 4px;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    border: 1.5px solid white;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-  }
-
-  .actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .actions .btn { flex: 1; padding: 12px; font-size: 14px; }
-
-  /* RESULT */
-  .result-inner {
+  main {
     flex: 1;
     overflow-y: auto;
-    padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 14px;
-    align-items: center;
+    padding: 4px 2px 80px;
   }
-  .verdict {
-    font-size: 48px;
-    text-align: center;
-    animation: pop 0.5s ease;
-  }
-  .verdict-text {
-    font-size: 26px;
-    font-weight: 900;
-    text-align: center;
-    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .vs-row {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    align-items: stretch;
-  }
-  .outfit-card {
-    flex: 1;
-    background: rgba(255,255,255,0.75);
-    border-radius: 18px;
-    padding: 12px 8px;
-    text-align: center;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-  }
-  .outfit-card.winner {
-    background: linear-gradient(160deg, #fff4cf, #ffd6e0);
-    box-shadow: 0 6px 20px rgba(255,179,71,0.4);
-    transform: scale(1.03);
-  }
-  .outfit-card .label { font-size: 12px; opacity: 0.7; font-weight: 600; }
-  .outfit-card .stack { font-size: 28px; line-height: 1.05; margin: 6px 0; }
-  .outfit-card .pts {
-    font-size: 22px;
-    font-weight: 900;
-    color: #8a4fff;
-  }
-  .breakdown {
-    width: 100%;
-    background: rgba(255,255,255,0.65);
+  main::-webkit-scrollbar { display: none; }
+
+  section.card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 16px;
     padding: 12px 14px;
-    font-size: 13px;
+    backdrop-filter: blur(10px);
   }
-  .breakdown h3 { font-size: 14px; margin-bottom: 8px; }
-  .br-row { display: flex; justify-content: space-between; padding: 4px 0; }
-  .br-row span:last-child { font-weight: 700; color: #8a4fff; }
-
-  .vs-badge {
-    align-self: center;
-    font-weight: 900;
-    font-size: 14px;
-    color: #ff4f8b;
-    padding: 4px 10px;
-    background: white;
-    border-radius: 999px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    opacity: 0.6;
+    text-transform: uppercase;
+    margin-bottom: 8px;
   }
 
-  .toast {
-    position: fixed;
-    bottom: 80px; left: 50%;
-    transform: translateX(-50%);
-    background: rgba(42,26,58,0.92);
-    color: white;
-    padding: 10px 18px;
-    border-radius: 999px;
+  .h-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    margin: 0 -4px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  .h-scroll::-webkit-scrollbar { display: none; }
+
+  .chip {
+    flex: 0 0 auto;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid transparent;
+    color: #f0e9ff;
+    border-radius: 14px;
+    padding: 10px 12px;
     font-size: 13px;
     font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 110px;
+    transition: all 0.15s ease;
+  }
+  .chip:active { transform: scale(0.95); }
+  .chip.active {
+    background: linear-gradient(135deg, #ff4f8b, #8a4fff);
+    border-color: rgba(255,255,255,0.4);
+    box-shadow: 0 6px 18px rgba(138,79,255,0.45);
+  }
+  .chip .emoji { font-size: 20px; }
+  .chip .meta { font-size: 10px; opacity: 0.75; font-weight: 500; }
+
+  textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    color: #f0e9ff;
+    padding: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: none;
+    min-height: 90px;
+    line-height: 1.4;
+  }
+  textarea:focus {
+    outline: none;
+    border-color: #ff4f8b;
+    box-shadow: 0 0 0 2px rgba(255,79,139,0.2);
+  }
+
+  .row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .preset {
+    flex: 1 1 auto;
+    background: rgba(255,255,255,0.08);
+    border: none;
+    color: #f0e9ff;
+    padding: 8px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .preset:active { transform: scale(0.95); }
+
+  .stage {
+    background: linear-gradient(180deg, rgba(255,79,139,0.12), rgba(79,195,255,0.12));
+    border-radius: 18px;
+    padding: 18px 14px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.08);
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stage .who {
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0.85;
+  }
+  .stage .who .small { font-size: 11px; opacity: 0.7; font-weight: 500; }
+  .lyric {
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.3;
+    min-height: 24px;
+  }
+  .lyric .syl {
+    display: inline-block;
+    transition: transform 0.15s ease, color 0.15s ease;
+    margin: 0 1px;
+  }
+  .lyric .syl.on {
+    color: #ffd84a;
+    transform: translateY(-6px) scale(1.15);
+    text-shadow: 0 4px 14px rgba(255,216,74,0.6);
+  }
+
+  .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 30px;
+  }
+  .bar {
+    width: 4px;
+    background: linear-gradient(180deg, #ff4f8b, #4fc3ff);
+    border-radius: 2px;
+    height: 4px;
+    transition: height 0.1s ease;
+  }
+  .bars.on .bar { animation: dance 0.6s infinite alternate; }
+  .bars.on .bar:nth-child(2) { animation-delay: 0.1s; }
+  .bars.on .bar:nth-child(3) { animation-delay: 0.2s; }
+  .bars.on .bar:nth-child(4) { animation-delay: 0.05s; }
+  .bars.on .bar:nth-child(5) { animation-delay: 0.15s; }
+  @keyframes dance { to { height: 28px; } }
+
+  footer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, transparent, #0d0820 40%);
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+  footer > * { pointer-events: auto; }
+  footer .inner {
+    width: 100%;
+    max-width: 456px;
+    display: flex;
+    gap: 8px;
+  }
+  .btn {
+    border: none;
+    color: white;
+    padding: 14px 18px;
+    font-size: 15px;
+    font-weight: 800;
+    border-radius: 999px;
+    cursor: pointer;
+    flex: 1;
+    box-shadow: 0 8px 22px rgba(138, 79, 255, 0.45);
+    transition: transform 0.12s ease;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn.sing {
+    background: linear-gradient(90deg, #ff4f8b, #8a4fff);
+  }
+  .btn.stop {
+    background: rgba(255,255,255,0.1);
+    color: #f0e9ff;
+    box-shadow: none;
+    flex: 0 0 80px;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .toast {
+    position: fixed;
+    bottom: 84px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255,255,255,0.95);
+    color: #0d0820;
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    z-index: 100;
+    transition: opacity 0.2s ease;
   }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
+  .toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 <div id="app">
   <header>
-    <h1>Mode Spel</h1>
-    <p>Stel jouw perfecte outfit samen</p>
+    <h1>🎤 ZING-O-MATIC</h1>
+    <p>Kies een artiest, een tekst en een genre</p>
   </header>
 
-  <!-- HOME SCREEN -->
-  <section class="screen active" id="home">
-    <div class="home-inner">
-      <div class="logo">👗</div>
-      <h2>Word jij<br/>de stijlkoning(in)?</h2>
-      <p>Mix tops, broeken, schoenen en accessoires. De beste look wint van de stylist!</p>
-      <button class="btn" id="startBtn">Start spel ✨</button>
-    </div>
-  </section>
+  <main>
+    <section class="card">
+      <div class="label">1. Artiest</div>
+      <div class="h-scroll" id="artists"></div>
+    </section>
 
-  <!-- GAME SCREEN -->
-  <section class="screen" id="game">
-    <div class="mannequin-wrap">
-      <div class="score-pill" id="livePill">Score: 0</div>
-      <div class="mannequin">
-        <div class="head"><div class="smile"></div></div>
-        <div class="body-zone">
-          <div class="slot slot-top empty" data-slot="top">Top</div>
-          <div class="slot slot-bottom empty" data-slot="bottom">Broek</div>
-          <div class="slot slot-shoes empty" data-slot="shoes">Schoenen</div>
-          <div class="slot slot-acc empty" data-slot="acc">+</div>
-        </div>
+    <section class="card">
+      <div class="label">2. Genre</div>
+      <div class="h-scroll" id="genres"></div>
+    </section>
+
+    <section class="card">
+      <div class="label">3. Tekst</div>
+      <textarea id="lyrics" placeholder="Schrijf hier de songtekst die de artiest moet zingen..." maxlength="400">De zon schijnt door het raam, ik zing een lied voor jou</textarea>
+      <div class="row">
+        <button class="preset" data-text="De zon schijnt door het raam, ik zing een lied voor jou">☀️ Zonnig</button>
+        <button class="preset" data-text="Tranen vallen in de regen, mijn hart is leeg vannacht">💔 Verdriet</button>
+        <button class="preset" data-text="Yo, check the rhythm, ik ben de beste in de game">🎧 Stoer</button>
+        <button class="preset" data-text="Dansen tot de zon opkomt, vannacht is van ons">🪩 Feest</button>
       </div>
-    </div>
-    <div class="picker">
-      <div class="tabs" id="tabs"></div>
-      <div class="items" id="items"></div>
-      <div class="actions">
-        <button class="btn secondary" id="resetBtn">Wis</button>
-        <button class="btn" id="judgeBtn">Beoordeel 🏆</button>
+    </section>
+
+    <section class="stage">
+      <div class="who" id="who">Selecteer een artiest & genre</div>
+      <div class="lyric" id="lyric">🎶 ... 🎶</div>
+      <div class="bars" id="bars">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <div class="bar"></div><div class="bar"></div>
       </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="inner">
+      <button class="btn sing" id="singBtn">🎤 Laat zingen</button>
+      <button class="btn stop" id="stopBtn">⏹</button>
     </div>
-  </section>
-
-  <!-- RESULT SCREEN -->
-  <section class="screen" id="result">
-    <div class="result-inner">
-      <div class="verdict" id="verdictEmoji">🎉</div>
-      <div class="verdict-text" id="verdictText">Geweldig!</div>
-
-      <div class="vs-row">
-        <div class="outfit-card" id="cardYou">
-          <div class="label">JIJ</div>
-          <div class="stack" id="stackYou"></div>
-          <div class="pts" id="ptsYou">0</div>
-        </div>
-        <div class="vs-badge">VS</div>
-        <div class="outfit-card" id="cardAi">
-          <div class="label">STYLIST</div>
-          <div class="stack" id="stackAi"></div>
-          <div class="pts" id="ptsAi">0</div>
-        </div>
-      </div>
-
-      <div class="breakdown" id="breakdown"></div>
-
-      <button class="btn" id="playAgainBtn">Opnieuw spelen 🔁</button>
-    </div>
-  </section>
+  </footer>
 
   <div class="toast" id="toast"></div>
 </div>
 
 <script>
-  // ---------- DATA ----------
-  // Color families used for harmony scoring.
-  // family: warm | cool | neutral | bright
-  const wardrobe = {
-    top: [
-      { e: '👕', name: 'Wit T-shirt',     color: '#fafafa', family: 'neutral', style: 'casual', trend: 7 },
-      { e: '👚', name: 'Roze blouse',     color: '#ff8fb8', family: 'warm',    style: 'chique',  trend: 8 },
-      { e: '🧥', name: 'Bruine jas',      color: '#8a5a3b', family: 'warm',    style: 'chique',  trend: 7 },
-      { e: '🥼', name: 'Witte coat',      color: '#f3eede', family: 'neutral', style: 'chique',  trend: 6 },
-      { e: '🎽', name: 'Sport top',       color: '#ff4f4f', family: 'bright',  style: 'sport',   trend: 6 },
-      { e: '👔', name: 'Blauw overhemd',  color: '#5a7fff', family: 'cool',    style: 'chique',  trend: 7 },
-      { e: '🩱', name: 'Zwart topje',     color: '#222',    family: 'neutral', style: 'casual',  trend: 8 },
-      { e: '🦺', name: 'Geel vest',       color: '#ffd84a', family: 'bright',  style: 'street',  trend: 9 },
-    ],
-    bottom: [
-      { e: '👖', name: 'Spijkerbroek',    color: '#3b6fa0', family: 'cool',    style: 'casual',  trend: 8 },
-      { e: '🩳', name: 'Korte broek',     color: '#5fb8a8', family: 'cool',    style: 'sport',   trend: 6 },
-      { e: '👗', name: 'Zomerjurk',       color: '#ff8fb8', family: 'warm',    style: 'chique',  trend: 9 },
-      { e: '🩲', name: 'Zwemshort',       color: '#ff7a3d', family: 'warm',    style: 'sport',   trend: 5 },
-      { e: '👘', name: 'Lange jurk',      color: '#8a4fff', family: 'cool',    style: 'chique',  trend: 8 },
-      { e: '🪡', name: 'Leren broek',     color: '#222',    family: 'neutral', style: 'street',  trend: 8 },
-    ],
-    shoes: [
-      { e: '👟', name: 'Sneakers',        color: '#fafafa', family: 'neutral', style: 'casual',  trend: 8 },
-      { e: '👠', name: 'Hakken',          color: '#cc1f3d', family: 'bright',  style: 'chique',  trend: 9 },
-      { e: '👢', name: 'Laarzen',         color: '#5a3a22', family: 'warm',    style: 'street',  trend: 7 },
-      { e: '🥾', name: 'Bergschoenen',    color: '#6a4a2b', family: 'warm',    style: 'sport',   trend: 5 },
-      { e: '🩴', name: 'Slippers',        color: '#5fb8e8', family: 'cool',    style: 'casual',  trend: 5 },
-      { e: '🥿', name: 'Ballerina',       color: '#ffb6c1', family: 'warm',    style: 'chique',  trend: 7 },
-    ],
-    acc: [
-      { e: '👜', name: 'Handtas',         color: '#cc6699', family: 'warm',    style: 'chique',  trend: 8 },
-      { e: '🎒', name: 'Rugzak',          color: '#3b6fa0', family: 'cool',    style: 'casual',  trend: 7 },
-      { e: '👒', name: 'Hoed',            color: '#f3eede', family: 'neutral', style: 'chique',  trend: 8 },
-      { e: '🧢', name: 'Pet',             color: '#222',    family: 'neutral', style: 'street',  trend: 7 },
-      { e: '🕶️', name: 'Zonnebril',      color: '#222',    family: 'neutral', style: 'street',  trend: 9 },
-      { e: '⌚', name: 'Horloge',         color: '#c0c0c0', family: 'neutral', style: 'chique',  trend: 7 },
-      { e: '💍', name: 'Ring',            color: '#ffd84a', family: 'bright',  style: 'chique',  trend: 6 },
-      { e: '👑', name: 'Kroon',           color: '#ffd84a', family: 'bright',  style: 'chique',  trend: 10 },
-    ],
-  };
+  // ---------- ARTISTS ----------
+  // gender: used for voice selection. pitch is base pitch offset, rate is base rate.
+  const artists = [
+    { id: 'adele',    name: 'Adele',         emoji: '🎙️', gender: 'female', pitch: 0.85, rate: 0.85, lang: 'en-GB', meta: 'Soulful' },
+    { id: 'beyonce',  name: 'Beyoncé',       emoji: '👑', gender: 'female', pitch: 1.15, rate: 1.0,  lang: 'en-US', meta: 'Diva power' },
+    { id: 'taylor',   name: 'Taylor Swift',  emoji: '✨', gender: 'female', pitch: 1.05, rate: 1.05, lang: 'en-US', meta: 'Pop sweet' },
+    { id: 'sheeran',  name: 'Ed Sheeran',    emoji: '🎸', gender: 'male',   pitch: 1.0,  rate: 1.0,  lang: 'en-GB', meta: 'Akoestisch' },
+    { id: 'drake',    name: 'Drake',         emoji: '🦉', gender: 'male',   pitch: 0.75, rate: 0.95, lang: 'en-US', meta: 'Smooth flow' },
+    { id: 'eminem',   name: 'Eminem',        emoji: '🔥', gender: 'male',   pitch: 0.9,  rate: 1.4,  lang: 'en-US', meta: 'Snel & scherp' },
+    { id: 'hazes',    name: 'André Hazes',   emoji: '🍻', gender: 'male',   pitch: 0.7,  rate: 0.85, lang: 'nl-NL', meta: 'Levenslied' },
+    { id: 'borsato',  name: 'Marco Borsato', emoji: '❤️', gender: 'male',   pitch: 0.85, rate: 0.9,  lang: 'nl-NL', meta: 'Smartlap' },
+    { id: 'aguilera', name: 'Christina A.',  emoji: '💖', gender: 'female', pitch: 1.3,  rate: 0.95, lang: 'en-US', meta: 'Hoge noten' },
+    { id: 'cash',     name: 'Johnny Cash',   emoji: '🤠', gender: 'male',   pitch: 0.55, rate: 0.8,  lang: 'en-US', meta: 'Diepe stem' },
+  ];
 
-  const tabConfig = [
-    { key: 'top',    label: '👕 Top' },
-    { key: 'bottom', label: '👖 Broek' },
-    { key: 'shoes',  label: '👟 Schoenen' },
-    { key: 'acc',    label: '👜 Accessoire' },
+  // ---------- GENRES ----------
+  // melody: array of pitch multipliers cycled per syllable.
+  // rateMul: multiplier on artist rate. pause: ms between syllables.
+  const genres = [
+    { id: 'pop',     name: 'Pop',     emoji: '🎵', melody: [1.0, 1.1, 1.05, 1.15, 1.0, 0.95], rateMul: 1.0,  pause: 90,  meta: 'Vrolijk' },
+    { id: 'rock',    name: 'Rock',    emoji: '🎸', melody: [0.9, 1.0, 0.85, 0.95, 1.1, 0.9],  rateMul: 1.05, pause: 70,  meta: 'Stevig' },
+    { id: 'opera',   name: 'Opera',   emoji: '🎭', melody: [1.2, 1.4, 1.3, 1.5, 1.25, 1.1],   rateMul: 0.6,  pause: 220, meta: 'Dramatisch' },
+    { id: 'rap',     name: 'Rap',     emoji: '🎤', melody: [0.95, 0.9, 1.0, 0.95],            rateMul: 1.6,  pause: 30,  meta: 'Spitting' },
+    { id: 'ballad',  name: 'Ballad',  emoji: '🕯️', melody: [0.95, 1.05, 1.0, 1.1, 0.9, 0.85], rateMul: 0.7,  pause: 180, meta: 'Emotioneel' },
+    { id: 'techno',  name: 'Techno',  emoji: '🤖', melody: [1.0, 1.0, 1.05, 1.0, 0.95, 1.0],  rateMul: 1.3,  pause: 50,  meta: 'Hypnotisch' },
+    { id: 'reggae',  name: 'Reggae',  emoji: '🌴', melody: [1.0, 0.95, 1.05, 0.9, 1.0, 0.95], rateMul: 0.85, pause: 140, meta: 'Chillax' },
+    { id: 'country', name: 'Country', emoji: '🤠', melody: [0.95, 1.05, 1.1, 0.95, 1.0, 0.9], rateMul: 0.9,  pause: 120, meta: 'Twangy' },
+    { id: 'jazz',    name: 'Jazz',    emoji: '🎷', melody: [1.0, 1.1, 0.85, 1.05, 0.9, 1.15], rateMul: 0.95, pause: 130, meta: 'Smooth' },
+    { id: 'kinder',  name: 'Kinder',  emoji: '🧸', melody: [1.2, 1.3, 1.4, 1.3, 1.2, 1.35],   rateMul: 1.1,  pause: 100, meta: 'Vrolijk hoog' },
   ];
 
   // ---------- STATE ----------
-  let activeTab = 'top';
-  const outfit = { top: null, bottom: null, shoes: null, acc: null };
+  let selectedArtist = artists[0];
+  let selectedGenre = genres[0];
+  let voices = [];
+  let isSinging = false;
+
+  // ---------- VOICES ----------
+  function loadVoices() {
+    voices = window.speechSynthesis.getVoices();
+  }
+  if (typeof speechSynthesis !== 'undefined') {
+    loadVoices();
+    speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  function pickVoice(artist) {
+    if (!voices.length) return null;
+    // Prefer matching language + gender hint in name.
+    const langMatches = voices.filter(v => v.lang.startsWith(artist.lang.split('-')[0]));
+    const genderHints = artist.gender === 'female'
+      ? ['female', 'woman', 'samantha', 'victoria', 'karen', 'tessa', 'fiona', 'moira', 'ellen', 'xander']
+      : ['male', 'man', 'daniel', 'alex', 'fred', 'oliver', 'thomas', 'rishi'];
+    const pool = langMatches.length ? langMatches : voices;
+    const matched = pool.find(v => genderHints.some(h => v.name.toLowerCase().includes(h)));
+    return matched || pool[0] || voices[0];
+  }
 
   // ---------- DOM ----------
-  const $ = (sel) => document.querySelector(sel);
-  const tabs = $('#tabs');
-  const items = $('#items');
-  const livePill = $('#livePill');
+  const $ = (s) => document.querySelector(s);
+  const artistsEl = $('#artists');
+  const genresEl = $('#genres');
+  const lyricsEl = $('#lyrics');
+  const whoEl = $('#who');
+  const lyricEl = $('#lyric');
+  const barsEl = $('#bars');
 
-  function show(screen) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screen).classList.add('active');
+  function renderArtists() {
+    artistsEl.innerHTML = '';
+    artists.forEach(a => {
+      const c = document.createElement('button');
+      c.className = 'chip' + (a.id === selectedArtist.id ? ' active' : '');
+      c.innerHTML = `<span class="emoji">${a.emoji}</span><div><div>${a.name}</div><div class="meta">${a.meta}</div></div>`;
+      c.onclick = () => { selectedArtist = a; renderArtists(); updateWho(); };
+      artistsEl.appendChild(c);
+    });
   }
 
-  function toast(msg) {
+  function renderGenres() {
+    genresEl.innerHTML = '';
+    genres.forEach(g => {
+      const c = document.createElement('button');
+      c.className = 'chip' + (g.id === selectedGenre.id ? ' active' : '');
+      c.innerHTML = `<span class="emoji">${g.emoji}</span><div><div>${g.name}</div><div class="meta">${g.meta}</div></div>`;
+      c.onclick = () => { selectedGenre = g; renderGenres(); updateWho(); };
+      genresEl.appendChild(c);
+    });
+  }
+
+  function updateWho() {
+    whoEl.innerHTML = `${selectedArtist.emoji} <b>${selectedArtist.name}</b> <span class="small">zingt in</span> ${selectedGenre.emoji} <b>${selectedGenre.name}</b>`;
+  }
+
+  function toast(m) {
     const t = $('#toast');
-    t.textContent = msg;
+    t.textContent = m;
     t.classList.add('show');
     clearTimeout(t._h);
-    t._h = setTimeout(() => t.classList.remove('show'), 1400);
+    t._h = setTimeout(() => t.classList.remove('show'), 1500);
   }
 
-  // ---------- RENDERING ----------
-  function renderTabs() {
-    tabs.innerHTML = '';
-    tabConfig.forEach(t => {
-      const b = document.createElement('button');
-      b.className = 'tab' + (t.key === activeTab ? ' active' : '');
-      b.textContent = t.label;
-      b.onclick = () => { activeTab = t.key; renderTabs(); renderItems(); };
-      tabs.appendChild(b);
+  // ---------- SING ----------
+  function syllabify(text) {
+    // Word-level syllabification: split each word on vowel groups.
+    const words = text.trim().split(/\s+/);
+    const result = [];
+    words.forEach((w, wi) => {
+      const parts = w.match(/[^aeiouyAEIOUY]*[aeiouyAEIOUY]+(?:[^aeiouyAEIOUY]*$|[^aeiouyAEIOUY](?=[^aeiouyAEIOUY]))?/g);
+      const sylls = (parts && parts.length) ? parts : [w];
+      sylls.forEach((s, si) => {
+        result.push({ text: s, isLast: si === sylls.length - 1, wordIndex: wi });
+      });
+    });
+    return result;
+  }
+
+  function renderLyric(syllables) {
+    lyricEl.innerHTML = '';
+    let lastWord = -1;
+    syllables.forEach((s, i) => {
+      if (s.wordIndex !== lastWord && lastWord !== -1) {
+        lyricEl.appendChild(document.createTextNode(' '));
+      }
+      lastWord = s.wordIndex;
+      const span = document.createElement('span');
+      span.className = 'syl';
+      span.dataset.idx = i;
+      span.textContent = s.text;
+      lyricEl.appendChild(span);
     });
   }
 
-  function renderItems() {
-    items.innerHTML = '';
-    wardrobe[activeTab].forEach((it, idx) => {
-      const d = document.createElement('div');
-      d.className = 'item' + (outfit[activeTab] && outfit[activeTab].idx === idx ? ' selected' : '');
-      d.innerHTML = `<span>${it.e}</span><span class="swatch" style="background:${it.color}"></span>`;
-      d.title = it.name;
-      d.onclick = () => selectItem(activeTab, idx);
-      items.appendChild(d);
-    });
+  function highlightSyllable(idx) {
+    document.querySelectorAll('.syl').forEach(el => el.classList.remove('on'));
+    const el = document.querySelector(`.syl[data-idx="${idx}"]`);
+    if (el) el.classList.add('on');
   }
 
-  function selectItem(slot, idx) {
-    const it = wardrobe[slot][idx];
-    outfit[slot] = { ...it, idx };
-    const slotEl = document.querySelector(`.slot[data-slot="${slot}"]`);
-    slotEl.classList.remove('empty');
-    slotEl.classList.add('filled');
-    slotEl.textContent = it.e;
-    slotEl.style.color = it.color;
-    // Re-trigger animation
-    slotEl.style.animation = 'none';
-    void slotEl.offsetWidth;
-    slotEl.style.animation = '';
-    renderItems();
-    updateLiveScore();
-  }
-
-  function resetOutfit() {
-    Object.keys(outfit).forEach(k => {
-      outfit[k] = null;
-      const s = document.querySelector(`.slot[data-slot="${k}"]`);
-      s.classList.add('empty');
-      s.classList.remove('filled');
-      s.textContent = k === 'top' ? 'Top' : k === 'bottom' ? 'Broek' : k === 'shoes' ? 'Schoenen' : '+';
-    });
-    renderItems();
-    updateLiveScore();
-  }
-
-  // ---------- SCORING ----------
-  function score(o) {
-    const parts = [o.top, o.bottom, o.shoes, o.acc].filter(Boolean);
-    if (parts.length === 0) return { total: 0, harmony: 0, style: 0, trend: 0, complete: 0 };
-
-    // Color harmony: more shared families = higher score, but neutrals always blend.
-    const families = parts.map(p => p.family);
-    const uniqueNonNeutral = new Set(families.filter(f => f !== 'neutral'));
-    let harmony;
-    if (uniqueNonNeutral.size <= 1) harmony = 25;
-    else if (uniqueNonNeutral.size === 2) harmony = 18;
-    else harmony = 8;
-
-    // Style coherence
-    const styles = parts.map(p => p.style);
-    const uniqueStyles = new Set(styles);
-    let styleScore;
-    if (uniqueStyles.size === 1) styleScore = 25;
-    else if (uniqueStyles.size === 2) styleScore = 16;
-    else styleScore = 6;
-
-    // Trend average
-    const trendAvg = parts.reduce((s, p) => s + p.trend, 0) / parts.length;
-    const trendScore = Math.round(trendAvg * 2.5); // 0-25
-
-    // Completeness bonus
-    const complete = parts.length === 4 ? 25 : parts.length * 4;
-
-    const total = harmony + styleScore + trendScore + complete;
-    return { total, harmony, style: styleScore, trend: trendScore, complete };
-  }
-
-  function updateLiveScore() {
-    const s = score(outfit);
-    livePill.textContent = `Score: ${s.total}`;
-  }
-
-  // ---------- AI OPPONENT ----------
-  function generateAiOutfit() {
-    // The stylist tries a coherent look: pick a target family + style, then best items.
-    const families = ['warm', 'cool', 'neutral', 'bright'];
-    const styles = ['casual', 'chique', 'sport', 'street'];
-    const tFam = families[Math.floor(Math.random() * families.length)];
-    const tSty = styles[Math.floor(Math.random() * styles.length)];
-
-    function pickFor(slot) {
-      const pool = wardrobe[slot];
-      const ranked = pool.map((it, idx) => {
-        let s = it.trend;
-        if (it.family === tFam || it.family === 'neutral') s += 5;
-        if (it.style === tSty) s += 4;
-        return { it, idx, s };
-      }).sort((a, b) => b.s - a.s);
-      // Pick from top 2 to add variety
-      const choice = ranked[Math.floor(Math.random() * Math.min(2, ranked.length))];
-      return { ...choice.it, idx: choice.idx };
-    }
-
-    return {
-      top: pickFor('top'),
-      bottom: pickFor('bottom'),
-      shoes: pickFor('shoes'),
-      acc: pickFor('acc'),
-    };
-  }
-
-  // ---------- JUDGE ----------
-  function judge() {
-    const filled = Object.values(outfit).filter(Boolean).length;
-    if (filled < 3) {
-      toast('Kies minstens 3 onderdelen!');
+  function sing() {
+    if (!('speechSynthesis' in window)) {
+      toast('Spraak niet ondersteund 😔');
       return;
     }
+    const text = lyricsEl.value.trim();
+    if (!text) { toast('Schrijf eerst een tekst!'); return; }
 
-    const you = score(outfit);
-    const ai = generateAiOutfit();
-    const aiScore = score(ai);
+    speechSynthesis.cancel();
+    if (!voices.length) loadVoices();
 
-    $('#stackYou').textContent = ['top','bottom','shoes','acc'].map(k => outfit[k]?.e || '·').join('');
-    $('#ptsYou').textContent = you.total;
-    $('#stackAi').textContent = [ai.top.e, ai.bottom.e, ai.shoes.e, ai.acc.e].join('');
-    $('#ptsAi').textContent = aiScore.total;
+    const syllables = syllabify(text);
+    if (!syllables.length) return;
+    renderLyric(syllables);
+    barsEl.classList.add('on');
+    isSinging = true;
 
-    $('#cardYou').classList.toggle('winner', you.total >= aiScore.total);
-    $('#cardAi').classList.toggle('winner', aiScore.total > you.total);
+    const voice = pickVoice(selectedArtist);
+    const melody = selectedGenre.melody;
+    let i = 0;
 
-    let emoji, text;
-    if (you.total > aiScore.total) {
-      emoji = '🏆'; text = 'Jij wint! Stijlicoon!';
-    } else if (you.total === aiScore.total) {
-      emoji = '🤝'; text = 'Gelijkspel — sterke look!';
-    } else {
-      emoji = '💅'; text = 'Stylist wint deze ronde';
-    }
-    $('#verdictEmoji').textContent = emoji;
-    $('#verdictText').textContent = text;
+    const speakNext = () => {
+      if (!isSinging || i >= syllables.length) {
+        isSinging = false;
+        barsEl.classList.remove('on');
+        document.querySelectorAll('.syl').forEach(el => el.classList.remove('on'));
+        return;
+      }
+      const s = syllables[i];
+      const u = new SpeechSynthesisUtterance(s.text);
+      if (voice) u.voice = voice;
+      u.lang = selectedArtist.lang;
+      const melodyMul = melody[i % melody.length];
+      u.pitch = Math.max(0.1, Math.min(2, selectedArtist.pitch * melodyMul));
+      u.rate = Math.max(0.1, Math.min(3, selectedArtist.rate * selectedGenre.rateMul));
+      u.volume = 1;
 
-    $('#breakdown').innerHTML = `
-      <h3>Jouw beoordeling</h3>
-      <div class="br-row"><span>🎨 Kleurharmonie</span><span>${you.harmony}/25</span></div>
-      <div class="br-row"><span>✨ Stijlcoherentie</span><span>${you.style}/25</span></div>
-      <div class="br-row"><span>🔥 Trendscore</span><span>${you.trend}/25</span></div>
-      <div class="br-row"><span>👗 Compleetheid</span><span>${you.complete}/25</span></div>
-      <div class="br-row" style="border-top:1px solid rgba(0,0,0,0.1); margin-top:6px; padding-top:8px;">
-        <span><b>Totaal</b></span><span><b>${you.total}/100</b></span>
-      </div>
-    `;
+      highlightSyllable(i);
 
-    show('result');
+      u.onend = () => {
+        i++;
+        const pauseMs = s.isLast ? selectedGenre.pause * 2 : selectedGenre.pause;
+        setTimeout(speakNext, pauseMs);
+      };
+      u.onerror = () => {
+        i++;
+        setTimeout(speakNext, 50);
+      };
+      speechSynthesis.speak(u);
+    };
+    speakNext();
   }
 
-  // ---------- INIT ----------
-  $('#startBtn').onclick = () => show('game');
-  $('#resetBtn').onclick = resetOutfit;
-  $('#judgeBtn').onclick = judge;
-  $('#playAgainBtn').onclick = () => { resetOutfit(); show('game'); };
+  function stop() {
+    isSinging = false;
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    barsEl.classList.remove('on');
+    document.querySelectorAll('.syl').forEach(el => el.classList.remove('on'));
+  }
 
-  renderTabs();
-  renderItems();
+  // ---------- EVENTS ----------
+  $('#singBtn').onclick = sing;
+  $('#stopBtn').onclick = stop;
+
+  document.querySelectorAll('.preset').forEach(p => {
+    p.onclick = () => { lyricsEl.value = p.dataset.text; };
+  });
+
+  // ---------- INIT ----------
+  renderArtists();
+  renderGenres();
+  updateWho();
 </script>
 </body>
 </html>
